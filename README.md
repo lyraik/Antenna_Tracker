@@ -14,4 +14,7 @@
     - PlatformIO IDE
 6. Reload VS Code
 7. Clone Github repository https://github.com/lyraik/Antenna_Tracker.git to local folder
+    - [Git beginners guide](https://www.elegantthemes.com/blog/resources/git-and-github-a-beginners-guide-for-complete-newbies)
+    - [Workflow tutorial](https://www.atlassian.com/git/tutorials/comparing-workflows)
+    - We're using the centralised workflow
 8. Open this folder in VS Code (File->Open Folder)
