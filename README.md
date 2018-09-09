@@ -18,3 +18,4 @@
     - [Workflow tutorial](https://www.atlassian.com/git/tutorials/comparing-workflows)
     - We're using the centralised workflow
 8. Open this folder in VS Code (File->Open Folder)
+9. Wait until "PlatformIO: IntelliSense Index rebuild" on the status bar disappears
