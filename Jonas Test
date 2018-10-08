@@ -1,0 +1,21 @@
+#include
+#include
+
+using namesspace GPSBodenstation;
+
+class GPSDaten
+{
+    public:
+    int ZData
+    int XData
+    int YData
+    void getZData();
+    void getXData();
+    void getYData();
+}
+void GPSDaten:: getZData
+{}
+void GPSDaten :: getXData
+{}
+void GPSData :: getYData
+{}
