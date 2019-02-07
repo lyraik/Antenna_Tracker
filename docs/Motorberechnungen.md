@@ -1,6 +1,6 @@
 # Motor Berechnung
 
-## Model v16 Parameter
+## Model 2 v16 Parameter
     Area	1.351E+05 mm^2
     Density	0.003 g / mm^3
     Mass	379.229 g

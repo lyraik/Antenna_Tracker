@@ -1,13 +1,10 @@
 {
     "build": {
-      "core": "esp32",
-      "extra_flags": "-DARDUINO_NodeMCU_32S",
+      "extra_flags": "",
       "f_cpu": "240000000L",
       "f_flash": "40000000L",
       "flash_mode": "dio",
-      "ldscript": "esp32_out.ld",
-      "mcu": "esp32",
-      "variant": "nodemcu-32"
+      "ldscript": "esp32_out.ld"
     },
     "connectivity": [
       "wifi",
@@ -20,7 +17,7 @@
     },
     "frameworks": [
       "arduino",
-      "espidf"
+      "espidf-latest"
     ],
     "name": "JoyItESP32",
     "upload": {
