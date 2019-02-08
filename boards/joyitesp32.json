@@ -17,7 +17,7 @@
     },
     "frameworks": [
       "arduino",
-      "espidf-latest"
+      "espidf"
     ],
     "name": "JoyItESP32",
     "upload": {
