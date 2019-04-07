@@ -1,7 +1,11 @@
-//Dieses File beinhaltet API's für GPS Peripherien
+//Jonas
 #include <iostream>
 
-//Jonas
+/**
+ * @brief 
+ * Code muss noch geschrieben werden (von Jonas)
+ * 
+ */
 class GPS
 {
     public:

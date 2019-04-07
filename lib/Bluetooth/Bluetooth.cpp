@@ -1,6 +1,5 @@
 #include <Bluetooth.h>
 
-#include <EnvoirementRecources.h>
 
 
 //Hole Name von der Geräteantwort und schreibt ihn nach bdname

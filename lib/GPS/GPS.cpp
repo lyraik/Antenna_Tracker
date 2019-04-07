@@ -4,8 +4,6 @@
 GPS::GPS(uint8_t TxPin, uint8_t RxPin)
 {
     //Code zum Initialisieren des GPS (wird noch geschrieben von Jonas)
-
-
 }
 //Jonas
 float GPS::getLat()
@@ -37,5 +35,3 @@ float GPS::getAlt()
 
     return altitude;
 }
-
-

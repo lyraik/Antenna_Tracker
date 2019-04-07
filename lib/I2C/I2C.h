@@ -1,78 +1,94 @@
-//Dieses File enthält Reccourcen für I2C Peripherien
+/**
+ * @file I2C.h
+ * 
+ * @author Dominic Möri (mdomin470@gmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2019-04-07
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #include <iostream>
 #include <stdio.h>
 #include "esp_log.h"
 #include <driver/i2c.h>
- 
-/**************************Defines**************************/
+
+/**************************Tags**************************/
 #define ERROR_TAG "ESP_ERROR"
 #define I2C_TAG "ESP_I2C"
-#define ACK         0x1
-#define WRITE_BIT   0x1
-#define READ_BIT    0x0
 
-/*********************Classes*******************************/
-
-/*
-class I2C
+/**********Namespace i2c contains all i2c reccources**********/
+namespace i2c
 {
-    private:
-        i2c_port_t I2CPort;
-        i2c_mode_t I2CMode;
-        uint32_t I2CFrequency;
-        gpio_num_t SdaPin;
-        gpio_num_t SclPin;
+constexpr uint8_t ACK = 0x01;
+constexpr uint8_t WRITE_BIT = 0x01;
+constexpr uint8_t READ_BIR = 0x0;
 
-         //Konfigurationsparameter
-        i2c_config_t conf;
+//Konfigurationsparameter
+extern i2c_config_t conf;
+/**
+ * @brief 
+ *  I2C Port
+ */
+extern i2c_port_t I2CPort;
+extern bool check;
+/**
+ * @brief
+ *  Check wird beim ersten initalisieren gesetzt und beim 
+ *  deinitialisieren gelöscht, dass nur ein I2C initialisiert werden kann
+ * 
+ */
 
-    public:
-        //Initialisiert I2C
-        //Beispielparameter sind:
-        //Port = I2C_NUM_0 (gibt nur Port 0 und Port 1)
-        //Mode = I2C_MODE_MASTER
-        //Frequency: 100000
-        //Sda = 21 (Der SDA Pin auf dem Pinout)
-        //Scl = 22 (Der SCL Pin auf dem Pinout)
-        I2C(i2c_port_t Port, i2c_mode_t Mode, uint32_t Frequency, gpio_num_t Sda, gpio_num_t Scl);
-        
-        //Initialisiere I2c mit den Parametern aus den Konstruktor
-        bool init();
 
-        //Lese I2C Daten: Der Pointer zu Data sind die empfangenen Daten
-        //der Data Pointer sollte auf ein Array zeigen, welches mindestend so gross wie die erwarteten Datenpakete ist 
-        void read(uint8_t SlaveAddress, int n, uint8_t *Data);
-        //Rückgabewert: True wenn Acknowledged vom Slave, False wenn die Übertragung scheiterte
-        void write(uint8_t SlaveAddress, uint8_t Data);
-};
-*/
-extern "C"
-{
-      i2c_port_t I2CPort;
-        i2c_mode_t I2CMode;
-        uint32_t I2CFrequency;
-        gpio_num_t SdaPin;
-        gpio_num_t SclPin;
+/**
+ * @brief Initialisiert das I2C 
+ * 
+ * @param Port 
+ * @param Mode 
+ * @param Frequency 
+ * @param Sda 
+ * @param Scl 
+ * @return uint8_t 
+ * 
+ * Beispielparameter sind:
+ * 
+ * Port = I2C_NUM_0 (gibt nur Port 0 und Port 1)
+ * Mode = I2C_MODE_MASTER
+ * Frequency: 100000
+ * Sda = 21 (Der SDA Pin auf dem Pinout)
+ * Scl = 22 (Der SCL Pin auf dem Pinout)
+ * 
+ */
+uint8_t init(i2c_port_t Port, i2c_mode_t Mode, uint32_t Frequency, gpio_num_t Sda, gpio_num_t Scl);
 
-         //Konfigurationsparameter
-        i2c_config_t conf;
+/**
+ * @brief deinitialisiert I2C 
+ * @return uint8_t 
+ */
+uint8_t deinit(void);
 
-        //Initialisiert I2C
-        //Beispielparameter sind:
-        //Port = I2C_NUM_0 (gibt nur Port 0 und Port 1)
-        //Mode = I2C_MODE_MASTER
-        //Frequency: 100000
-        //Sda = 21 (Der SDA Pin auf dem Pinout)
-        //Scl = 22 (Der SCL Pin auf dem Pinout)
-        uint8_t I2CInit(i2c_port_t Port, i2c_mode_t Mode, uint32_t Frequency, gpio_num_t Sda, gpio_num_t Scl);
-        
-        //Initialisiere I2c mit den Parametern aus den Konstruktor
-        bool init();
+/**
+ * @brief 
+ *
+ * Lese I2C Daten: Der Pointer zu Data sind die empfangenen Daten
+ * der Data Pointer sollte auf ein Array zeigen, welches mindestend
+ *  so gross wie die erwarteten Datenpakete ist
+ *  
+ * @param SlaveAddress 
+ * @param n 
+ * @param Data 
+ */
+void read(uint8_t SlaveAddress, int n, uint8_t *Data);
 
-        //Lese I2C Daten: Der Pointer zu Data sind die empfangenen Daten
-        //der Data Pointer sollte auf ein Array zeigen, welches mindestend so gross wie die erwarteten Datenpakete ist 
-        void readI2C(uint8_t SlaveAddress, int n, uint8_t *Data);
-        //Rückgabewert: True wenn Acknowledged vom Slave, False wenn die Übertragung scheiterte
-        void writeI2C(uint8_t SlaveAddress, uint8_t Data);
-}
-    
+/**
+ * @brief 
+ * Rückgabewert: True wenn Acknowledged vom Slave, False wenn die Übertragung scheiterte 
+ * @param SlaveAddress 
+ * @param Data 
+ */
+void write(uint8_t SlaveAddress, uint8_t Data);
+
+} // namespace i2c
+

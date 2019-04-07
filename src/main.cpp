@@ -5,11 +5,11 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <iostream>
 #include "nvs.h"
 #include "nvs_flash.h"
 #include "freertos/FreeRTOS.h"
@@ -24,45 +24,49 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 
-//Enthält Parameter welche den Zustand des Antenna Trackers und der Drohne beschreiben 
-#include <EnvoirementRecources.h>
+//Enthält Parameter welche den Zustand des Antenna Trackers und der Drohne beschreiben
+//#include "config.h"
 
 //Enthält Bluetooth Reccourcen & Bluetooth Task
-#include <Bluetooth.h>
+#include "Bluetooth.h"
 
 //Enthält GPS Reccourcen
-#include <GPS.h>
+#include "GPS.h"
 
 //Entwält I2C Reccourcen
-#include <MagnetSensor.h>
+#include "MagnetSensor.h"
 
-    #define MAG_VAL_TAG "Magnetic Sensor value"
-    #define MAIN_TAG "Main"
+#define MAG_VAL_TAG "Magnetic Sensor value"
+#define MAIN_TAG "Antenna Tracker"
+#define POS_TAG "Positioningstask"
 
+/**
+ * @brief 
+ * 
+ * @param params
+ * 
+ * WARNING!! Diesr Task muss genügend Stack erhalten wenn er kreiert wird! 
+ */
 void positioningsTask(void *params)
 {
-    float North;
-    //Neues GPS Objekt erstellen (GPS wird im Konstruktor initalisiert)
-    //GPS GPS1();
 
-    //Core panikt wenn ein neues Objekt erstellt wird
-   // MagnetSensor *Mysensor = new MagnetSensor();
+    // ESP_LOGI(MAIN_TAG, "Postiion wird bestimmt...");
     InitMagnetSensor();
-   // Mysensor->calibrate();
-    //Gehe zu Stopp-position Code dafür muss noch geschrieben werden. 
+
+    //Gehe zu Stopp-position Code dafür muss noch geschrieben werden.
     //Hardwaretreiber noch nicht geschtieben!
 
     //Mache eine Runde mit dem Antenna-Tracker und suche den Wert vom Magnet sensor heraus,
     //der zu Norden passt
     //North wird zu diesem Wert (Referenz für alle späteren Berechnungen)
-    
-    while(1)
+    ESP_LOGI(POS_TAG, "triangulating position...");
+    uint8_t buffer[2] = {0,0};
+    while (1)
     {
-       //ESP_LOGI(MAG_VAL_TAG, "Sensor return value: %f \n", Mysensor.GetRaw());
-       vTaskDelay(1000 / portTICK_PERIOD_MS);
+        i2c::read(0x03,1,&buffer[0]);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
-
 
 void blink_task(void *pvParameter)
 {
@@ -78,7 +82,8 @@ void blink_task(void *pvParameter)
     /* Set the GPIO as a push/pull output */
     gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
 
-    while(1) {
+    while (1)
+    {
         /* Blink off (output low) */
         gpio_set_level(BLINK_GPIO, 0);
         vTaskDelay(200 / portTICK_PERIOD_MS);
@@ -91,22 +96,20 @@ void blink_task(void *pvParameter)
 extern "C"
 {
     void app_main()
-    {    
+    {
         enableBluetooth();
-       // xTaskCreate(&bluetooth_task,"Bluetooth_task",configMINIMAL_STACK_SIZE,NULL,5,NULL);
+        // xTaskCreate(&bluetooth_task,"Bluetooth_task",configMINIMAL_STACK_SIZE,NULL,5,NULL);
         xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
-        xTaskCreate(&positioningsTask,"positioninsTask",configMINIMAL_STACK_SIZE,NULL,5,NULL);
-    //  xTaskCreate(&BattSurvailanceTask,"BatterySurvailanceTask",configMINIMAL_STACK_SIZE,NULL,5,NULL);
-        
-        ESP_LOGI(MAIN_TAG,"Welcome to the Antenna tracker Software");
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        xTaskCreate(&positioningsTask, "postask", 2000, NULL, 4, NULL);
+        //  xTaskCreate(&BattSurvailanceTask,"BatterySurvailanceTask",configMINIMAL_STACK_SIZE,NULL,5,NULL);
 
-        while(1)
+        ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+
+        while (1)
         {
-            
             /* Blink on (output high) */
-            vTaskDelay(100/portTICK_PERIOD_MS);
-            
+            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
     }
 }
