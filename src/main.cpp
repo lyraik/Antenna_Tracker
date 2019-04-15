@@ -45,13 +45,15 @@
  * 
  * @param params
  * 
- * WARNING!! Diesr Task muss genügend Stack erhalten wenn er kreiert wird! 
+ * WARNING!! Diesr Task muss genügend Stack erhalten wenn er erstellt wird! 
  */
 void positioningsTask(void *params)
 {
-
-    // ESP_LOGI(MAIN_TAG, "Postiion wird bestimmt...");
-    InitMagnetSensor();
+    /**
+     * @brief Construct a new magnetsens::Init object
+     * 
+     */
+    magnetsens::Init();
 
     //Gehe zu Stopp-position Code dafür muss noch geschrieben werden.
     //Hardwaretreiber noch nicht geschtieben!
@@ -60,14 +62,19 @@ void positioningsTask(void *params)
     //der zu Norden passt
     //North wird zu diesem Wert (Referenz für alle späteren Berechnungen)
     ESP_LOGI(POS_TAG, "triangulating position...");
-    uint8_t buffer[2] = {0,0};
+    
+    magnetsens::Calibrate();
     while (1)
     {
-        i2c::read(0x03,1,&buffer[0]);
+        ESP_LOGI(POS_TAG, " value: \t %f" ,magnetsens::GetRaw());
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
-
+/**
+ * @brief 
+ * 
+ * @param pvParameter 
+ */
 void blink_task(void *pvParameter)
 {
     /* Configure the IOMUX register for pad BLINK_GPIO (some pads are
@@ -93,6 +100,38 @@ void blink_task(void *pvParameter)
     }
 }
 
+/**
+ * @brief 
+ * 
+ * @param paramenter 
+ */
+void BatterySurvailance(void *paramenter)
+{
+
+    /**
+     * @brief 
+     * Initialisiere I2C für ADC's, falls noch nicht initialisiert
+     * 
+     */
+    if(i2c::check != true)
+    {
+        i2c_port_t Port = I2C_NUM_0;
+        gpio_num_t sda = GPIO_NUM_21;
+        gpio_num_t scl = GPIO_NUM_22;
+        i2c::init(Port, I2C_MODE_MASTER, 100000, sda, scl);
+    }
+    ESP_LOGI(I2C_TAG,"Connecting to ADCs...");
+
+
+    while(1)
+    {
+
+
+
+
+    }
+}
+
 extern "C"
 {
     void app_main()
@@ -101,7 +140,7 @@ extern "C"
         // xTaskCreate(&bluetooth_task,"Bluetooth_task",configMINIMAL_STACK_SIZE,NULL,5,NULL);
         xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
         xTaskCreate(&positioningsTask, "postask", 2000, NULL, 4, NULL);
-        //  xTaskCreate(&BattSurvailanceTask,"BatterySurvailanceTask",configMINIMAL_STACK_SIZE,NULL,5,NULL);
+        xTaskCreate(&BatterySurvailance,"BatterySurvailance",2000,NULL,4,NULL);
 
         ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
         vTaskDelay(100 / portTICK_PERIOD_MS);

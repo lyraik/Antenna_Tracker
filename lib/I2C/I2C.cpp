@@ -42,7 +42,8 @@ uint8_t init(i2c_port_t Port, i2c_mode_t Mode, uint32_t Frequency, gpio_num_t Sd
         .sda_io_num = Sda,
         .sda_pullup_en = GPIO_PULLUP_ENABLE,
         .scl_io_num = Scl,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE};
+        .scl_pullup_en = GPIO_PULLUP_ENABLE
+    };
 
     if (conf.mode == I2C_MODE_MASTER)
     {
@@ -78,24 +79,39 @@ uint8_t init(i2c_port_t Port, i2c_mode_t Mode, uint32_t Frequency, gpio_num_t Sd
 
 //Lese I2C Daten: Der Pointer zu Data sind die empfangenen Daten
 //der Data Pointer sollte auf ein Array zeigen, welches mindestend so gross wie die erwarteten Datenpakete ist
+/**
+ * @brief 
+ * 
+ * @param SlaveAddress 
+ * @param n 
+ * @param Data 
+ */
 void read(uint8_t SlaveAddress, int n, uint8_t *Data)
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, SlaveAddress << 1, ACK);
-    i2c_master_read(cmd, Data, n - 1, I2C_MASTER_ACK);
+    i2c_master_write_byte(cmd, SlaveAddress, ACK);
+    i2c_master_read(cmd, Data, n, I2C_MASTER_ACK);
     i2c_master_stop(cmd);
     i2c_master_cmd_begin(I2CPort, cmd, 50 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
 }
 
 //Rückgabewert: True wenn Acknowledged vom Slave, False wenn die Übertragung scheiterte
-void write(uint8_t SlaveAddress, uint8_t Data)
+/**
+ * @brief 
+ * 
+ * @param SlaveAddress 
+ * @param n 
+ * @param Data 
+ */
+void write(uint8_t SlaveAddress,uint8_t n, uint8_t *Data)
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (SlaveAddress << 1) | WRITE_BIT, ACK);
-    i2c_master_write(cmd, &Data, 1, ACK);
+    i2c_master_write_byte(cmd, SlaveAddress, ACK);
+    i2c_master_write(cmd, Data, n, ACK);
     i2c_master_stop(cmd);
     i2c_master_cmd_begin(I2CPort, cmd, 50 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);

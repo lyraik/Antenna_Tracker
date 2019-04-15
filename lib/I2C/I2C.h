@@ -88,7 +88,7 @@ void read(uint8_t SlaveAddress, int n, uint8_t *Data);
  * @param SlaveAddress 
  * @param Data 
  */
-void write(uint8_t SlaveAddress, uint8_t Data);
+void write(uint8_t SlaveAddress,uint8_t n, uint8_t *Data);
 
 } // namespace i2c
 
