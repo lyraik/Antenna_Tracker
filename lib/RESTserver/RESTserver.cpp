@@ -42,7 +42,6 @@ esp_err_t Init()
         "Antennatrack",
         "example"
     };
-
     wifi_config_t wifiCfg = { .sta = stacfg };
     
 
