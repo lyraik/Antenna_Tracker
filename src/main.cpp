@@ -36,6 +36,9 @@
 //Entwält I2C Reccourcen
 #include "MagnetSensor.h"
 
+//Server Reccourcen
+#include "RESTserver.h"
+
 #define MAG_VAL_TAG "Magnetic Sensor value"
 #define MAIN_TAG "Antenna Tracker"
 #define POS_TAG "Positioningstask"
@@ -100,6 +103,19 @@ void blink_task(void *pvParameter)
     }
 }
 
+void CommunicationTask(void *pvParameter)
+{
+        if(restserver::Init() == ESP_OK)
+        {
+            ESP_LOGI(MAIN_TAG, "started wifi successfully");
+        }
+        
+        while(true)
+        {
+            ;
+        }
+}
+
 /**
  * @brief 
  * 
@@ -125,10 +141,7 @@ void BatterySurvailance(void *paramenter)
 
     while(1)
     {
-
-
-
-
+        ;
     }
 }
 
@@ -141,6 +154,8 @@ extern "C"
         xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
         xTaskCreate(&positioningsTask, "postask", 2000, NULL, 4, NULL);
         xTaskCreate(&BatterySurvailance,"BatterySurvailance",2000,NULL,4,NULL);
+        xTaskCreate(&CommunicationTask,"Communication",2000,NULL,4,NULL);
+
 
         ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
         vTaskDelay(100 / portTICK_PERIOD_MS);
