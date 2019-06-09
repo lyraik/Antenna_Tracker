@@ -68,7 +68,7 @@ void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
     case ESP_SPP_OPEN_EVT:
         ESP_LOGI(SPP_TAG, "ESP_SPP_OPEN_EVT");
 		//Schreibe Daten heraus: Daten mit der Länge spp_data_len & dem Pointer zu spp_data
-        esp_spp_write(param->srv_open.handle, SPP_DATA_LEN, spp_data);
+       // esp_spp_write(param->srv_open.handle, SPP_DATA_LEN, spp_data);
         break;
     case ESP_SPP_CLOSE_EVT:
         ESP_LOGI(SPP_TAG, "ESP_SPP_CLOSE_EVT");
@@ -87,7 +87,7 @@ void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
         ESP_LOGI(SPP_TAG, "ESP_SPP_CONG_EVT cong=%d", param->cong.cong);
 #endif
         if (param->cong.cong == 0) {
-            esp_spp_write(param->cong.handle, SPP_DATA_LEN, spp_data);
+         //   esp_spp_write(param->cong.handle, SPP_DATA_LEN, spp_data);
         }
         break;
 		
@@ -104,7 +104,7 @@ void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
 #endif
 		//Schreibe Daten über Bluetooth heraus
         if (param->write.cong == 0) {
-            esp_spp_write(param->write.handle, SPP_DATA_LEN, spp_data);
+      //      esp_spp_write(param->write.handle, SPP_DATA_LEN, spp_data);
         }
         break;
     case ESP_SPP_SRV_OPEN_EVT:

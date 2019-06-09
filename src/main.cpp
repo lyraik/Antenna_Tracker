@@ -22,7 +22,10 @@
 #include "esp_spp_api.h"
 #include "sdkconfig.h"
 #include "esp_log.h"
+#include "esp_task_wdt.h"
+#include "esp_int_wdt.h"
 #include "driver/gpio.h"
+#include "soc/rtc_wdt.h"
 
 //Enthält Parameter welche den Zustand des Antenna Trackers und der Drohne beschreiben
 //#include "config.h"
@@ -43,6 +46,8 @@
 #define MAIN_TAG "Antenna Tracker"
 #define POS_TAG "Positioningstask"
 
+
+
 /**
  * @brief 
  * 
@@ -58,6 +63,7 @@ void positioningsTask(void *params)
      */
     magnetsens::Init();
 
+    
     //Gehe zu Stopp-position Code dafür muss noch geschrieben werden.
     //Hardwaretreiber noch nicht geschtieben!
 
@@ -69,9 +75,13 @@ void positioningsTask(void *params)
     magnetsens::Calibrate();
     while (1)
     {
-        ESP_LOGI(POS_TAG, " value: \t %f" ,magnetsens::GetRaw());
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        static int x = 0;
+        x ++;
+    //    ESP_LOGI(POS_TAG, " value: \t %f" ,magnetsens::GetRaw());
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+
+    
 }
 /**
  * @brief 
@@ -105,14 +115,24 @@ void blink_task(void *pvParameter)
 
 void CommunicationTask(void *pvParameter)
 {
+        
+        enableBluetooth();
+        
+
         if(restserver::Init() == ESP_OK)
         {
-            ESP_LOGI(MAIN_TAG, "started wifi successfully");
+            ESP_LOGI(MAIN_TAG, "\n \n started wifi successfully \n \n");
         }
+        else
+        {
+            ESP_LOGI(MAIN_TAG, "\n \n start wifi failed \n \n");
+        }
+
         
         while(true)
         {
-            ;
+          //  ESP_LOGI(POS_TAG, "no communication!");
+            vTaskDelay(30000 / portTICK_PERIOD_MS);
         }
 }
 
@@ -136,12 +156,13 @@ void BatterySurvailance(void *paramenter)
         gpio_num_t scl = GPIO_NUM_22;
         i2c::init(Port, I2C_MODE_MASTER, 100000, sda, scl);
     }
-    ESP_LOGI(I2C_TAG,"Connecting to ADCs...");
+    ESP_LOGI(MAIN_TAG,"Connecting to ADCs...");
 
 
     while(1)
     {
-        ;
+        //ESP_LOGI("Battery survailance", "no power problems detected");
+        vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
 }
 
@@ -149,12 +170,18 @@ extern "C"
 {
     void app_main()
     {
-        enableBluetooth();
+        /**
+         * @brief Construct a new rtc wdt disable object
+         * Sehr wichtig, ansonsten setzt sich der MCU nach 20 sek zurück!
+         * 
+         */
+        rtc_wdt_disable();
+        
         // xTaskCreate(&bluetooth_task,"Bluetooth_task",configMINIMAL_STACK_SIZE,NULL,5,NULL);
         xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
         xTaskCreate(&positioningsTask, "postask", 2000, NULL, 4, NULL);
         xTaskCreate(&BatterySurvailance,"BatterySurvailance",2000,NULL,4,NULL);
-        xTaskCreate(&CommunicationTask,"Communication",2000,NULL,4,NULL);
+        xTaskCreate(&CommunicationTask,"Communication",5000,NULL,4,NULL);
 
 
         ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
