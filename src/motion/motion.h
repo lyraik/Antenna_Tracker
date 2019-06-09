@@ -1,17 +1,24 @@
-#include <iostream>
 #include "esp_err.h"
+#include <iostream>
 
-namespace motion
-{
-    esp_err_t initServo();
+namespace motion {
+  
+    namespace servo {
+        esp_err_t init();
 
-    esp_err_t initStepperMotor();
+        esp_err_t setAxis(float angle, uint8_t velocity = 0, uint8_t acceleration = 0);
 
-    esp_err_t setYaxis(float angle, uint8_t velocity = 0, uint8_t acceleration = 0);
+        esp_err_t deinit();
+    } // namespace servo
 
-    esp_err_t setXaxis(float angle, uint8_t velocity = 0, uint8_t acceleration = 0);
+    namespace stepper {
 
-    esp_err_t deinitServo();
+        esp_err_t init();
 
-    esp_err_t deinitStepperMotor();
-}
+        esp_err_t setAxis(float angle, uint8_t velocity = 0, uint8_t acceleration = 0);
+
+        esp_err_t deinit();
+
+    } // namespace stepper
+
+} // namespace motion

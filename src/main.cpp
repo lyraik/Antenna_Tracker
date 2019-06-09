@@ -41,7 +41,7 @@
 #include "RESTserver/RESTserver.h"
 
 //Motor Reccourcen
-#include "motion/motion.h"
+#include "Motion/Motion.h"
 
 #define MAG_VAL_TAG "Magnetic Sensor value"
 #define MAIN_TAG "Antenna Tracker"
@@ -81,7 +81,7 @@ void positioningsTask(void *params)
     //und finde den Winkel mit dem grössten Wert
     for(int i = 0; i<360;i++)
     {
-        motion::setXaxis(i);
+        motion::stepper::setAxis(i);
         magbuff[i] = magnetsens::GetRaw();
         
         if(magbuff[i] >= magbuff[north])

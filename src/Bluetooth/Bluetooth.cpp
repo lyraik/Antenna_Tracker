@@ -1,6 +1,12 @@
 #include "Bluetooth.h"
 
 namespace bluetooth {
+
+    
+    float lattitude = 0;
+     float longitude = 0;
+
+
     mavlink_message_t msg;
     mavlink_status_t status;
 
@@ -96,28 +102,17 @@ namespace bluetooth {
                         ESP_LOGI(SPP_TAG, "PITCH: \t %f \n", mavlink_msg_attitude_get_pitch(&msg));
                         ESP_LOGI(SPP_TAG, "ROLL: \t %f \n", mavlink_msg_attitude_get_roll(&msg));
                         ESP_LOGI(SPP_TAG, "YAW: \t %f \n", mavlink_msg_attitude_get_yaw(&msg));
-                    } else if (msg.msgid == 0) {
+                    }
+                     else if (msg.msgid == 0) {
+
                         ESP_LOGI(SPP_TAG, "Hearbeat");
-                    } else if (msg.msgid == 109) {
-
-        for(int i = 0; i< param->data_ind.len; i++)
-        {   
-            if(mavlink_parse_char(1, *(param->data_ind.data + i),&msg, &status))
-            {
-                 //Wenn die MessageId 33 ist (Message mit ID 33 sind GPS-Daten) -> Die Daten ins Terminal herausschreiben
-                if(msg.msgid == 33)
-                {
-                    //Lattitude und Longitude ins Terminal herausschreiben
-                   ESP_LOGI(SPP_TAG, "Lattitude areal vehicle: \t %d", mavlink_msg_global_position_int_cov_get_lat(&msg));
-                   ESP_LOGI(SPP_TAG, "Longitude areal vehicle: \t %d", mavlink_msg_global_position_int_cov_get_lon(&msg));
-                   //Schreibe den Höhenwert ins Servo ! muss noch auf einen Winkel angepasst werden
-                
-                    lattitude = mavlink_msg_global_position_int_cov_get_lat(&msg);
-                    longitude = mavlink_msg_global_position_int_cov_get_lon(&msg);
-
+                    } 
+                    else if (msg.msgid == 109)
+                    {
+                        ESP_LOGI(SPP_TAG, "no device connected");
+                    }
                 }
             }
-
             break;
         case ESP_SPP_CONG_EVT:
 #if (SPP_SHOW_MODE == SPP_SHOW_DATA)
