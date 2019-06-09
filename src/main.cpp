@@ -5,21 +5,17 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-#include <stdint.h>
-#include <string.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <iostream>
-#include "nvs.h"
-#include "nvs_flash.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_log.h"
+#include "driver/gpio.h"
 #include "esp_bt.h"
+#include "esp_bt_device.h"
 #include "esp_bt_main.h"
 #include "esp_gap_bt_api.h"
-#include "esp_bt_device.h"
+#include "esp_log.h"
 #include "esp_spp_api.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "nvs.h"
+#include "nvs_flash.h"
 #include "sdkconfig.h"
 #include "esp_log.h"
 #include "esp_task_wdt.h"
@@ -29,8 +25,8 @@
 
 #include "math.h"
 
-//Enthält Parameter welche den Zustand des Antenna Trackers und der Drohne beschreiben
-//#include "config.h"
+// Enthält Parameter welche den Zustand des Antenna Trackers und der Drohne
+// beschreiben #include "config.h"
 
 //Enthält Bluetooth Reccourcen & Bluetooth Task
 #include "Bluetooth/Bluetooth.h"
@@ -49,18 +45,17 @@
 #define POS_TAG "Positioningstask"
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  * @param params
- * 
- * WARNING!! Diesr Task muss genügend Stack erhalten wenn er erstellt wird! 
+ *
+ * WARNING!! Diesr Task muss genügend Stack erhalten wenn er erstellt wird!
  */
-void positioningsTask(void *params)
-{
+void positioningsTask(void *params) {
     /**
      * 
      * @brief Construct a new magnetsens::Init object
-     * 
+     *
      */
     magnetsens::Init();
 
@@ -68,11 +63,11 @@ void positioningsTask(void *params)
     //Gehe zu Stopp-position Code dafür muss noch geschrieben werden.
     //Hardwaretreiber noch nicht geschtieben!
 
-    //Mache eine Runde mit dem Antenna-Tracker und suche den Wert vom Magnet sensor heraus,
-    //der zu Norden passt
-    //North wird zu diesem Wert (Referenz für alle späteren Berechnungen)
+    // Mache eine Runde mit dem Antenna-Tracker und suche den Wert vom Magnet
+    // sensor heraus, der zu Norden passt North wird zu diesem Wert (Referenz für
+    // alle späteren Berechnungen)
     ESP_LOGI(POS_TAG, "triangulating position...");
-    
+
     magnetsens::Calibrate();
     while (1)
     {
@@ -85,12 +80,11 @@ void positioningsTask(void *params)
     
 }
 /**
- * @brief 
- * 
- * @param pvParameter 
+ * @brief
+ *
+ * @param pvParameter
  */
-void blink_task(void *pvParameter)
-{
+void blink_task(void *pvParameter) {
     /* Configure the IOMUX register for pad BLINK_GPIO (some pads are
        muxed to GPIO on reset already, but some default to other
        functions and need to be switched to GPIO. Consult the
@@ -103,8 +97,7 @@ void blink_task(void *pvParameter)
     /* Set the GPIO as a push/pull output */
     gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
 
-    while (1)
-    {
+    while (1) {
         /* Blink off (output low) */
         gpio_set_level(BLINK_GPIO, 0);
         vTaskDelay(200 / portTICK_PERIOD_MS);
@@ -137,20 +130,18 @@ void CommunicationTask(void *pvParameter)
 }
 
 /**
- * @brief 
- * 
- * @param paramenter 
+ * @brief
+ *
+ * @param paramenter
  */
-void BatterySurvailance(void *paramenter)
-{
+void BatterySurvailance(void *paramenter) {
 
     /**
-     * @brief 
+     * @brief
      * Initialisiere I2C für ADC's, falls noch nicht initialisiert
-     * 
+     *
      */
-    if(i2c::check != true)
-    {
+    if (i2c::check != true) {
         i2c_port_t Port = I2C_NUM_0;
         gpio_num_t sda = GPIO_NUM_21;
         gpio_num_t scl = GPIO_NUM_22;
@@ -183,14 +174,12 @@ extern "C"
         xTaskCreate(&BatterySurvailance,"BatterySurvailance",2000,NULL,4,NULL);
         xTaskCreate(&CommunicationTask,"Communication",5000,NULL,4,NULL);
 
+    ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
+    vTaskDelay(100 / portTICK_PERIOD_MS);
 
-        ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
+    while (1) {
+        /* Blink on (output high) */
         vTaskDelay(100 / portTICK_PERIOD_MS);
-
-        while (1)
-        {
-            /* Blink on (output high) */
-            vTaskDelay(100 / portTICK_PERIOD_MS);
-        }
     }
+}
 }

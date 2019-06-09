@@ -5,3 +5,4 @@ build
 .vscode
 lib/readme.txt
 build/*
+include/README
