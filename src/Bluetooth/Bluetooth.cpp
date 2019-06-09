@@ -100,10 +100,21 @@ namespace bluetooth {
                         ESP_LOGI(SPP_TAG, "Hearbeat");
                     } else if (msg.msgid == 109) {
 
-                        ESP_LOGI(SPP_TAG, "Crossfire not connected");
-                    } else {
-                        ESP_LOGI(SPP_TAG, "msgid: %d", msg.msgid);
-                    }
+        for(int i = 0; i< param->data_ind.len; i++)
+        {   
+            if(mavlink_parse_char(1, *(param->data_ind.data + i),&msg, &status))
+            {
+                 //Wenn die MessageId 33 ist (Message mit ID 33 sind GPS-Daten) -> Die Daten ins Terminal herausschreiben
+                if(msg.msgid == 33)
+                {
+                    //Lattitude und Longitude ins Terminal herausschreiben
+                   ESP_LOGI(SPP_TAG, "Lattitude areal vehicle: \t %d", mavlink_msg_global_position_int_cov_get_lat(&msg));
+                   ESP_LOGI(SPP_TAG, "Longitude areal vehicle: \t %d", mavlink_msg_global_position_int_cov_get_lon(&msg));
+                   //Schreibe den Höhenwert ins Servo ! muss noch auf einen Winkel angepasst werden
+                
+                    lattitude = mavlink_msg_global_position_int_cov_get_lat(&msg);
+                    longitude = mavlink_msg_global_position_int_cov_get_lon(&msg);
+
                 }
             }
 

@@ -6,11 +6,10 @@
  * Code muss noch geschrieben werden (von Jonas)
  * 
  */
-class GPS
+namespace GPS
 {
-    public:
-        GPS(uint8_t TxPin, uint8_t RxPin);
-        float getLong();
-        float getLat(); 
-        float getAlt();
-};
+void init(uint8_t TxPin, uint8_t RxPin);
+float getLong();
+float getLat();
+float getAlt();
+} // namespace GPS

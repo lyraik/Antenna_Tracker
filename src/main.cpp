@@ -40,6 +40,9 @@
 //Server Reccourcen
 #include "RESTserver/RESTserver.h"
 
+//Motor Reccourcen
+#include "motion/motion.h"
+
 #define MAG_VAL_TAG "Magnetic Sensor value"
 #define MAIN_TAG "Antenna Tracker"
 #define POS_TAG "Positioningstask"
@@ -51,14 +54,18 @@
  *
  * WARNING!! Diesr Task muss genügend Stack erhalten wenn er erstellt wird!
  */
-void positioningsTask(void *params) {
+void positioningsTask(void *params)
+{
+    uint16_t north = 0;
+    uint16_t angle = 0;
+    float magbuff[360];
+    
     /**
      * 
      * @brief Construct a new magnetsens::Init object
      *
      */
     magnetsens::Init();
-
     
     //Gehe zu Stopp-position Code dafür muss noch geschrieben werden.
     //Hardwaretreiber noch nicht geschtieben!
@@ -69,15 +76,43 @@ void positioningsTask(void *params) {
     ESP_LOGI(POS_TAG, "triangulating position...");
 
     magnetsens::Calibrate();
-    while (1)
+
+    //Fahre einmal herum mit dem Antenna Tracker, lese in jedem Winkel das Magnetfeld ein
+    //und finde den Winkel mit dem grössten Wert
+    for(int i = 0; i<360;i++)
     {
-        static int x = 0;
-        x ++;
-    //    ESP_LOGI(POS_TAG, " value: \t %f" ,magnetsens::GetRaw());
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        motion::setXaxis(i);
+        magbuff[i] = magnetsens::GetRaw();
+        
+        if(magbuff[i] >= magbuff[north])
+        {
+            north = i;
+        }
+        
     }
 
-    
+    while (true)
+    {
+       if((bluetooth::longitude - GPS::getLong()) > 0)
+       {
+           if((bluetooth::lattitude - GPS::getLat()) > 0)
+           {
+               angle = 90 - atan((bluetooth::lattitude - GPS::getLat())/(bluetooth::longitude - GPS::getLong()));
+           }
+           else
+           {
+                angle = 90 + atan(-((bluetooth::lattitude - GPS::getLat())/(bluetooth::longitude - GPS::getLong())));
+           }
+       }
+       else
+       {
+
+       }
+       
+
+
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
 }
 /**
  * @brief

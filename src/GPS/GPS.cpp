@@ -1,12 +1,15 @@
 #include "GPS.h"
 #include <stdint.h>
+
+namespace GPS
+{
 //Jonas
-GPS::GPS(uint8_t TxPin, uint8_t RxPin)
+void init(uint8_t TxPin, uint8_t RxPin)
 {
     //Code zum Initialisieren des GPS (wird noch geschrieben von Jonas)
 }
 //Jonas
-float GPS::getLat()
+float getLat()
 {
     //Attribut, welches den Lattitude Wert erhält
     float lattitude = 0;
@@ -16,7 +19,7 @@ float GPS::getLat()
     return lattitude;
 }
 //Jonas
-float GPS::getLong()
+float getLong()
 {
     //Attribut, welches den Longitude Wert erhält
     float longitude = 0;
@@ -26,7 +29,7 @@ float GPS::getLong()
     return longitude;
 }
 //Jonas
-float GPS::getAlt()
+float getAlt()
 {
     //Attribut, welches den Altitude Wert erhält
     float altitude = 0;
@@ -35,3 +38,4 @@ float GPS::getAlt()
 
     return altitude;
 }
+} // namespace GPS

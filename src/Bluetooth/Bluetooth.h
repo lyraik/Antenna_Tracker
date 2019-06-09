@@ -65,6 +65,9 @@ static uint8_t spp_data[SPP_DATA_LEN];
 extern mavlink_message_t msg;
 extern mavlink_status_t status;
 
+float lattitude = 0;
+float longitude = 0;
+
 /************************************API's******************************************/
 
 // Task for Bluetooth handeling
