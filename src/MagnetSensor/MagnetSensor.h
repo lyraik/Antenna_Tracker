@@ -1,6 +1,6 @@
 //Dieses File enthält Reccourcen für den Magentsensor xy
 #include <iostream>
-#include <I2C.h>
+#include "i2c/I2C.h"
 #include <esp_log.h>
 #include <driver/gpio.h>
 

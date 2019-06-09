@@ -27,26 +27,26 @@
 #include "driver/gpio.h"
 #include "soc/rtc_wdt.h"
 
+#include "math.h"
+
 //Enthält Parameter welche den Zustand des Antenna Trackers und der Drohne beschreiben
 //#include "config.h"
 
 //Enthält Bluetooth Reccourcen & Bluetooth Task
-#include "Bluetooth.h"
+#include "Bluetooth/Bluetooth.h"
 
 //Enthält GPS Reccourcen
-#include "GPS.h"
+#include "GPS/GPS.h"
 
 //Entwält I2C Reccourcen
-#include "MagnetSensor.h"
+#include "MagnetSensor/MagnetSensor.h"
 
 //Server Reccourcen
-#include "RESTserver.h"
+#include "RESTserver/RESTserver.h"
 
 #define MAG_VAL_TAG "Magnetic Sensor value"
 #define MAIN_TAG "Antenna Tracker"
 #define POS_TAG "Positioningstask"
-
-
 
 /**
  * @brief 
@@ -58,6 +58,7 @@
 void positioningsTask(void *params)
 {
     /**
+     * 
      * @brief Construct a new magnetsens::Init object
      * 
      */
@@ -116,8 +117,7 @@ void blink_task(void *pvParameter)
 void CommunicationTask(void *pvParameter)
 {
         
-        enableBluetooth();
-        
+        bluetooth::enableBluetooth();
 
         if(restserver::Init() == ESP_OK)
         {

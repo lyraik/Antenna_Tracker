@@ -1,4 +1,4 @@
-#include <GPS.h>
+#include "GPS.h"
 #include <stdint.h>
 //Jonas
 GPS::GPS(uint8_t TxPin, uint8_t RxPin)

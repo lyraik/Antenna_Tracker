@@ -1,6 +1,9 @@
-#include <Bluetooth.h>
+#include "Bluetooth.h"
 
-
+namespace bluetooth
+{
+ mavlink_message_t msg;
+ mavlink_status_t status;
 
 //Hole Name von der Geräteantwort und schreibt ihn nach bdname
 bool getEirValues(uint8_t* eir, char *bdname, uint8_t *bdname_len)
@@ -80,7 +83,43 @@ void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
         ESP_LOGI(SPP_TAG, "ESP_SPP_CL_INIT_EVT");
         break;
     case ESP_SPP_DATA_IND_EVT:
-        ESP_LOGI(SPP_TAG, "ESP_SPP_DATA_IND_EVT");
+
+        for(int i = 0; i< param->data_ind.len; i++)
+        {   
+            if(mavlink_parse_char(1, *(param->data_ind.data + i),&msg, &status))
+            {
+                 //Wenn die MessageId 33 ist (Message mit ID 33 sind GPS-Daten) -> Die Daten ins Terminal herausschreiben
+                if(msg.msgid == 33)
+                {
+                    //Lattitude und Longitude ins Terminal herausschreiben
+                   ESP_LOGI(SPP_TAG, "Lattitude: \t %d", mavlink_msg_global_position_int_cov_get_lat(&msg));
+                   ESP_LOGI(SPP_TAG, "Longitude: \t %d", mavlink_msg_global_position_int_cov_get_lon(&msg));
+                   //Schreibe den Höhenwert ins Servo ! muss noch auf einen Winkel angepasst werden
+                }
+                //Wenn die ID 30 ist (= pitch, yaw, roll Werte der Drohne)
+                else if(msg.msgid == 30)
+                {
+                   ESP_LOGI(SPP_TAG, "PITCH: \t %f \n", mavlink_msg_attitude_get_pitch(&msg));
+                   ESP_LOGI(SPP_TAG, "ROLL: \t %f \n", mavlink_msg_attitude_get_roll(&msg));
+                   ESP_LOGI(SPP_TAG, "YAW: \t %f \n", mavlink_msg_attitude_get_yaw(&msg));
+                }
+                else if(msg.msgid == 0)
+                {
+                    ESP_LOGI(SPP_TAG, "Hearbeat");
+                }
+                else if(msg.msgid == 109)
+                {
+                
+                    ESP_LOGI(SPP_TAG, "Crossfire not connected");
+                }
+                else
+                {
+                    ESP_LOGI(SPP_TAG, "msgid: %d", msg.msgid);
+                }
+                   
+            }
+        }
+       
         break;
     case ESP_SPP_CONG_EVT:
 #if (SPP_SHOW_MODE == SPP_SHOW_DATA)
@@ -263,3 +302,4 @@ void enableBluetooth(void)
         esp_bt_gap_set_pin(pin_type, 0, pin_code);
 }
 
+}

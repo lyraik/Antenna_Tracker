@@ -29,6 +29,11 @@
 #include "time.h"
 #include "sys/time.h"
 
+#include "c_library_v2/common/mavlink.h"
+
+namespace bluetooth
+{
+
 /******************************Attributes********************************************/
 
 //Kein VFS -> Wenn Daten ankommen wird ein Callback aufgerufen!
@@ -57,6 +62,9 @@ static const uint8_t inq_num_rsps = 0;
 //Char Array für Datenstring
 static uint8_t spp_data[SPP_DATA_LEN];
 
+extern mavlink_message_t msg;
+extern mavlink_status_t status;
+
 /************************************API's******************************************/
 
 //Task for Bluetooth handeling
@@ -74,3 +82,4 @@ void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param);
 //enables and initialises the Bluetooth stack and sets the params
 void enableBluetooth();
 
+}

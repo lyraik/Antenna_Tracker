@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2019
  * 
  */
-#include <MagnetSensor.h>
+#include "MagnetSensor.h"
 
 namespace magnetsens
 {
