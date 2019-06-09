@@ -29,7 +29,7 @@
 #include "sys/time.h"
 #include "time.h"
 
-#include "c_library_v2/common/mavlink.h"
+#include <mavlink/common/mavlink.h>
 
 namespace bluetooth
 {
