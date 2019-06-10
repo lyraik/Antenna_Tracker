@@ -10,17 +10,15 @@
 #include "esp_bt_device.h"
 #include "esp_bt_main.h"
 #include "esp_gap_bt_api.h"
+#include "esp_int_wdt.h"
 #include "esp_log.h"
 #include "esp_spp_api.h"
+#include "esp_task_wdt.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs.h"
 #include "nvs_flash.h"
 #include "sdkconfig.h"
-#include "esp_log.h"
-#include "esp_task_wdt.h"
-#include "esp_int_wdt.h"
-#include "driver/gpio.h"
 #include "soc/rtc_wdt.h"
 
 #include "math.h"
@@ -28,20 +26,23 @@
 // Enthält Parameter welche den Zustand des Antenna Trackers und der Drohne
 // beschreiben #include "config.h"
 
-//Enthält Bluetooth Reccourcen & Bluetooth Task
+// Enthält Bluetooth Reccourcen & Bluetooth Task
 #include "Bluetooth/Bluetooth.h"
 
-//Enthält GPS Reccourcen
+// Enthält GPS Reccourcen
 #include "GPS/GPS.h"
 
-//Entwält I2C Reccourcen
+// Entwält I2C Reccourcen
 #include "MagnetSensor/MagnetSensor.h"
 
-//Server Reccourcen
-#include "RESTserver/RESTserver.h"
+// Server Reccourcen
+#include "Webserver/Webserver.h"
 
-//Motor Reccourcen
+// Motor Reccourcen
 #include "Motion/Motion.h"
+
+#include "Webserver/Webserver.h"
+#include "Webserver/Wifi.h"
 
 #define MAG_VAL_TAG "Magnetic Sensor value"
 #define MAIN_TAG "Antenna Tracker"
@@ -54,21 +55,20 @@
  *
  * WARNING!! Diesr Task muss genügend Stack erhalten wenn er erstellt wird!
  */
-void positioningsTask(void *params)
-{
+void orientateTask(void* params) {
     uint16_t north = 0;
     uint16_t angle = 0;
     float magbuff[360];
-    
+
     /**
-     * 
+     *
      * @brief Construct a new magnetsens::Init object
      *
      */
     magnetsens::Init();
-    
-    //Gehe zu Stopp-position Code dafür muss noch geschrieben werden.
-    //Hardwaretreiber noch nicht geschtieben!
+
+    // Gehe zu Stopp-position Code dafür muss noch geschrieben werden.
+    // Hardwaretreiber noch nicht geschtieben!
 
     // Mache eine Runde mit dem Antenna-Tracker und suche den Wert vom Magnet
     // sensor heraus, der zu Norden passt North wird zu diesem Wert (Referenz für
@@ -77,41 +77,28 @@ void positioningsTask(void *params)
 
     magnetsens::Calibrate();
 
-    //Fahre einmal herum mit dem Antenna Tracker, lese in jedem Winkel das Magnetfeld ein
-    //und finde den Winkel mit dem grössten Wert
-    for(int i = 0; i<360;i++)
-    {
+    // Fahre einmal herum mit dem Antenna Tracker, lese in jedem Winkel das Magnetfeld ein
+    // und finde den Winkel mit dem grössten Wert
+    for (int i = 0; i < 360; i++) {
         motion::stepper::setAxis(i);
         magbuff[i] = magnetsens::GetRaw();
-        
-        if(magbuff[i] >= magbuff[north])
-        {
+
+        if (magbuff[i] >= magbuff[north]) {
             north = i;
         }
-        
     }
 
-    while (true)
-    {
-       if((bluetooth::longitude - GPS::getLong()) > 0)
-       {
-           if((bluetooth::lattitude - GPS::getLat()) > 0)
-           {
-               angle = 90 - atan((bluetooth::lattitude - GPS::getLat())/(bluetooth::longitude - GPS::getLong()));
-           }
-           else
-           {
-                angle = 90 + atan(-((bluetooth::lattitude - GPS::getLat())/(bluetooth::longitude - GPS::getLong())));
-           }
-       }
-       else
-       {
+    while (true) {
+        vTaskSuspend(NULL);
 
-       }
-       
-
-
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        if ((bluetooth::longitude - GPS::getLong()) > 0) {
+            if ((bluetooth::lattitude - GPS::getLat()) > 0) {
+                angle = 90 - atan((bluetooth::lattitude - GPS::getLat()) / (bluetooth::longitude - GPS::getLong()));
+            } else {
+                angle = 90 + atan(-((bluetooth::lattitude - GPS::getLat()) / (bluetooth::longitude - GPS::getLong())));
+            }
+        } else {
+        }
     }
 }
 /**
@@ -119,7 +106,7 @@ void positioningsTask(void *params)
  *
  * @param pvParameter
  */
-void blink_task(void *pvParameter) {
+void blinkTask(void* pvParameter) {
     /* Configure the IOMUX register for pad BLINK_GPIO (some pads are
        muxed to GPIO on reset already, but some default to other
        functions and need to be switched to GPIO. Consult the
@@ -142,26 +129,20 @@ void blink_task(void *pvParameter) {
     }
 }
 
-void CommunicationTask(void *pvParameter)
-{
-        
-        bluetooth::enableBluetooth();
+void communicateTask(void* pvParameter) {
+    bluetooth::enableBluetooth();
 
-        if(restserver::Init() == ESP_OK)
-        {
-            ESP_LOGI(MAIN_TAG, "\n \n started wifi successfully \n \n");
-        }
-        else
-        {
-            ESP_LOGI(MAIN_TAG, "\n \n start wifi failed \n \n");
-        }
+    // if (web::init() == ESP_OK) {
+    //     ESP_LOGI(MAIN_TAG, "\n \n started wifi successfully \n \n");
+    // } else {
+    //     ESP_LOGI(MAIN_TAG, "\n \n start wifi failed \n \n");
+    // }
 
-        
-        while(true)
-        {
-          //  ESP_LOGI(POS_TAG, "no communication!");
-            vTaskDelay(30000 / portTICK_PERIOD_MS);
-        }
+    while (true) {
+        //  ESP_LOGI(POS_TAG, "no communication!");
+        // vTaskDelay(30000 / portTICK_PERIOD_MS);
+        vTaskSuspend(NULL);
+    }
 }
 
 /**
@@ -169,8 +150,7 @@ void CommunicationTask(void *pvParameter)
  *
  * @param paramenter
  */
-void BatterySurvailance(void *paramenter) {
-
+void batteryMonitoringTask(void* paramenter) {
     /**
      * @brief
      * Initialisiere I2C für ADC's, falls noch nicht initialisiert
@@ -182,39 +162,39 @@ void BatterySurvailance(void *paramenter) {
         gpio_num_t scl = GPIO_NUM_22;
         i2c::init(Port, I2C_MODE_MASTER, 100000, sda, scl);
     }
-    ESP_LOGI(MAIN_TAG,"Connecting to ADCs...");
-
-
-    while(1)
-    {
-        //ESP_LOGI("Battery survailance", "no power problems detected");
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
-    }
-}
-
-extern "C"
-{
-    void app_main()
-    {
-        /**
-         * @brief Construct a new rtc wdt disable object
-         * Sehr wichtig, ansonsten setzt sich der MCU nach 20 sek zurück!
-         * 
-         */
-        rtc_wdt_disable();
-        
-        // xTaskCreate(&bluetooth_task,"Bluetooth_task",configMINIMAL_STACK_SIZE,NULL,5,NULL);
-        xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
-        xTaskCreate(&positioningsTask, "postask", 2000, NULL, 4, NULL);
-        xTaskCreate(&BatterySurvailance,"BatterySurvailance",2000,NULL,4,NULL);
-        xTaskCreate(&CommunicationTask,"Communication",5000,NULL,4,NULL);
-
-    ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    ESP_LOGI(MAIN_TAG, "Connecting to ADCs...");
 
     while (1) {
-        /* Blink on (output high) */
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskSuspend(NULL);
+        // ESP_LOGI("Battery survailance", "no power problems detected");
     }
 }
+
+extern "C" void app_main() {
+    /**
+     * @brief Construct a new rtc wdt disable object
+     * Sehr wichtig, ansonsten setzt sich der MCU nach 20 sek zurück!
+     *
+     */
+    rtc_wdt_disable();
+
+    // initialize non volatile memory
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
+    xTaskCreate(&blinkTask, "Blink", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    xTaskCreate(&orientateTask, "Orientation", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    xTaskCreate(&communicateTask, "Communication", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+
+    // initialize wifi ap
+    wifi::init("Antenna Tracker", "password");
+    // start web server
+    web::init();
+
+    ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
 }

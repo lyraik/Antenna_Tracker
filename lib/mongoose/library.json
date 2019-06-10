@@ -1,0 +1,12 @@
+{
+    "name": "mongoose",
+    "description": "Mongoose networking library",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cesanta/mongoose.git"
+    },
+    "include": "",
+    "build": {
+        "srcFilter": "+<*.h> +<*.c>"
+    }
+}
