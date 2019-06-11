@@ -29,7 +29,7 @@ namespace web {
         if (!ptr.get())
             return ESP_ERR_NO_MEM;
 
-        RETURN_ON_ERROR(ptr->start(), LOG_TAG);
+        ASSERT_RET_CHECK(ptr->start(), LOG_TAG);
         ptr.release();
         return ESP_OK;
     }

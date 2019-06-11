@@ -25,12 +25,12 @@ namespace wifi {
 
     esp_err_t init(utils::StringView ssid, utils::StringView password) {
         tcpip_adapter_init();
-        RETURN_ON_ERROR(esp_event_loop_init(nullptr, nullptr), LOG_TAG);
+        ASSERT_RET_CHECK(esp_event_loop_init(nullptr, nullptr), LOG_TAG);
 
         wifi_init_config_t initCfg = WIFI_INIT_CONFIG_DEFAULT();
-        RETURN_ON_ERROR(esp_wifi_init(&initCfg), LOG_TAG);
+        ASSERT_RET_CHECK(esp_wifi_init(&initCfg), LOG_TAG);
 
-        RETURN_ON_ERROR(esp_wifi_set_storage(WIFI_STORAGE_RAM), LOG_TAG);
+        ASSERT_RET_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM), LOG_TAG);
 
         // configure accesspoint
         wifi_ap_config_t apcfg;
@@ -51,7 +51,7 @@ namespace wifi {
         esp_wifi_set_config(ESP_IF_WIFI_AP, &wifiCfg);
 
         // start wifi ap
-        RETURN_ON_ERROR(esp_wifi_start(), LOG_TAG);
+        ASSERT_RET_CHECK(esp_wifi_start(), LOG_TAG);
 
         return ESP_OK;
     }

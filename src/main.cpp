@@ -187,9 +187,9 @@ extern "C" void app_main() {
     ESP_ERROR_CHECK(ret);
 
     xTaskCreate(&blinkTask, "Blink", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
-    xTaskCreate(&orientateTask, "Orientation", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
-    xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
-    xTaskCreate(&communicateTask, "Communication", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    xTaskCreate(&orientateTask, "Orientation", 3000, NULL, 1, NULL);
+    xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", 3000, NULL, 1, NULL);
+    xTaskCreate(&communicateTask, "Communication", 3000, NULL, 1, NULL);
 
     // initialize wifi ap
     wifi::init("Antenna Tracker", "password");
