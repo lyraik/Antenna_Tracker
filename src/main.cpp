@@ -132,11 +132,10 @@ void blinkTask(void* pvParameter) {
 void communicateTask(void* pvParameter) {
     bluetooth::enableBluetooth();
 
-    // if (web::init() == ESP_OK) {
-    //     ESP_LOGI(MAIN_TAG, "\n \n started wifi successfully \n \n");
-    // } else {
-    //     ESP_LOGI(MAIN_TAG, "\n \n start wifi failed \n \n");
-    // }
+    // initialize wifi ap
+    wifi::init("Antenna Tracker", "password");
+    // start web server
+    web::init();
 
     while (true) {
         //  ESP_LOGI(POS_TAG, "no communication!");
@@ -190,11 +189,6 @@ extern "C" void app_main() {
     xTaskCreate(&orientateTask, "Orientation", 3000, NULL, 1, NULL);
     xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", 3000, NULL, 1, NULL);
     xTaskCreate(&communicateTask, "Communication", 3000, NULL, 1, NULL);
-
-    // initialize wifi ap
-    wifi::init("Antenna Tracker", "password");
-    // start web server
-    web::init();
 
     ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
 }

@@ -13,6 +13,7 @@
 #ifndef _Webserver_h_
 #define _Webserver_h_
 
+#include "utils/String.h"
 #include <freertos/FreeRTOS.h>
 #include <mongoose/mongoose.h>
 #include "esp_err.h"
@@ -37,6 +38,9 @@ namespace web {
 
        private:
         void eventHandler(mg_connection* con, int event, void* ptr);
+
+        void handleFileRequest(mg_connection* con, http_message* msg, const utils::StringView& uri);
+        void handleRestRequest(mg_connection* con, http_message* msg, const utils::StringView& uri);
     };
 
     WebServer* webserver();

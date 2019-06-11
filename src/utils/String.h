@@ -18,14 +18,15 @@
 namespace utils {
 
     struct StringView {
-        char *str;
+        char* str;
         size_t length;
 
-        template <size_t N> StringView(const char (&arr)[N]) : str(const_cast<char *>(arr)), length(N - 1) {}
+        template <size_t N>
+        StringView(const char (&arr)[N]) : str(const_cast<char*>(arr)), length(N - 1) {}
 
-        StringView(const char *str, size_t length) : str(const_cast<char *>(str)), length(length) {}
+        StringView(const char* str, size_t length) : str(const_cast<char*>(str)), length(length) {}
     };
 
-} // namespace utils
+}  // namespace utils
 
-#endif //_String_h_
+#endif  //_String_h_
