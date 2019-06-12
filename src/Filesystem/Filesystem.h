@@ -31,12 +31,12 @@ namespace fs {
     using mode_t = const char*;
     struct Mode {
         static constexpr mode_t READ = "r";
-        static constexpr mode_t write = "w";
-        static constexpr mode_t append = "a";
+        static constexpr mode_t WRITE = "w";
+        static constexpr mode_t APPEND = "a";
 
-        static constexpr mode_t readu = "r+";
-        static constexpr mode_t writeu = "w+";
-        static constexpr mode_t appendu = "a+";
+        static constexpr mode_t READU = "r+";
+        static constexpr mode_t WRITEU = "w+";
+        static constexpr mode_t APPENDU = "a+";
     };
 
     class File {
@@ -51,6 +51,9 @@ namespace fs {
             close();
         }
 
+        bool open(const char* path, mode_t mode);
+        bool tryOpen(const char* path, mode_t mode);
+
         bool valid(){return m_file;}
 
         FILE* get() {
@@ -61,8 +64,11 @@ namespace fs {
             m_file = nullptr;
             return result;
         }
+        void reset(FILE* file){
+            close();
+            m_file = file;
+        }
 
-        bool open(const char* path, mode_t mode);
         void close();
         bool flush();
 

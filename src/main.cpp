@@ -5,6 +5,7 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
+#include "driver/adc.h"
 #include "driver/gpio.h"
 #include "esp_bt.h"
 #include "esp_bt_device.h"
@@ -20,7 +21,6 @@
 #include "nvs_flash.h"
 #include "sdkconfig.h"
 #include "soc/rtc_wdt.h"
-#include "driver/adc.h"
 
 #include "math.h"
 
@@ -44,6 +44,7 @@
 
 #include "Webserver/Webserver.h"
 #include "Webserver/Wifi.h"
+#include "Filesystem/Filesystem.h"
 
 #define MAG_VAL_TAG "Magnetic Sensor value"
 #define MAIN_TAG "Antenna Tracker"
@@ -56,7 +57,7 @@
  *
  * WARNING!! Diesr Task muss genügend Stack erhalten wenn er erstellt wird!
  */
-void orientateTask(void* params) {
+void orientationTask(void* params) {
     uint16_t north = 0;
     uint16_t angle = 0;
     float magbuff[360];
@@ -66,7 +67,7 @@ void orientateTask(void* params) {
      * @brief Construct a new magnetsens::Init object
      *
      */
-    magnetsens::Init();
+    magnetsens::init();
 
     // Gehe zu Stopp-position Code dafür muss noch geschrieben werden.
     // Hardwaretreiber noch nicht geschtieben!
@@ -76,15 +77,13 @@ void orientateTask(void* params) {
     // alle späteren Berechnungen)
     ESP_LOGI(POS_TAG, "triangulating position...");
 
-
-
-    magnetsens::Calibrate();
+    magnetsens::calibrate();
 
     // Fahre einmal herum mit dem Antenna Tracker, lese in jedem Winkel das Magnetfeld ein
     // und finde den Winkel mit dem grössten Wert
     for (int i = 0; i < 360; i++) {
         motion::stepper::setAxis(i);
-        magbuff[i] = magnetsens::GetRaw();
+        magbuff[i] = magnetsens::getRaw();
 
         if (magbuff[i] >= magbuff[north]) {
             north = i;
@@ -93,24 +92,15 @@ void orientateTask(void* params) {
 
     while (true) {
         if ((longitude - GPS::getLong()) > 0) {
-
             if ((lattitude - GPS::getLat()) > 0) {
-
                 angle = 90 - atan((lattitude - GPS::getLat()) / (longitude - GPS::getLong()));
-            }
-            else {
-
+            } else {
                 angle = 90 + atan(-((lattitude - GPS::getLat()) / (longitude - GPS::getLong())));
             }
-        } 
-        else if ((longitude - GPS::getLong()) < 0) {
-
+        } else if ((longitude - GPS::getLong()) < 0) {
             if ((lattitude - GPS::getLat()) > 0) {
-
                 angle = 270 + atan((lattitude - GPS::getLat()) / (longitude - GPS::getLong()));
-            } 
-            else {
-
+            } else {
                 angle = 270 - atan(-((lattitude - GPS::getLat()) / (longitude - GPS::getLong())));
             }
         }
@@ -148,22 +138,19 @@ void blinkTask(void* pvParameter) {
     }
 }
 
-void CommunicationTask(void *pvParameter) {
-
+void communicationTask(void* pvParameter) {
     enableBluetooth();
 
-    wifi::init("Antennatracker", "12345678");
-
-    if (web::init() == ESP_OK) {
+    if (wifi::init("Antenna Tracker", "12345678") == ESP_OK) {
         ESP_LOGI(MAIN_TAG, "\n \n started wifi successfully \n \n");
     } else {
         ESP_LOGI(MAIN_TAG, "\n \n start wifi failed \n \n");
     }
+    web::init();
 
-    
     while (true) {
-        //  ESP_LOGI(POS_TAG, "no communication!");
-        vTaskDelay(1 / portTICK_PERIOD_MS);
+        // remove when actually doing something
+        vTaskSuspend(NULL);
     }
 }
 /**
@@ -178,8 +165,7 @@ void batteryMonitoringTask(void* paramenter) {
      *
      */
 
-
-    if (i2c::check ==false) {
+    if (i2c::check == false) {
         i2c_port_t Port = I2C_NUM_0;
         gpio_num_t sda = GPIO_NUM_21;
         gpio_num_t scl = GPIO_NUM_22;
@@ -188,7 +174,8 @@ void batteryMonitoringTask(void* paramenter) {
     ESP_LOGI(MAIN_TAG, "Connecting to ADCs...");
 
     while (true) {
-        // ESP_LOGI("Battery survailance", "no power problems detected");
+        // remove when actually doing something
+        vTaskSuspend(NULL);
     }
 }
 
@@ -208,10 +195,12 @@ extern "C" void app_main() {
     }
     ESP_ERROR_CHECK(ret);
 
+    fs::init();
+
     xTaskCreate(&blinkTask, "Blink", configMINIMAL_STACK_SIZE, NULL, 4, NULL);
-    xTaskCreate(&orientateTask, "Orientation", 2000, NULL, 4, NULL);
+    xTaskCreate(&orientationTask, "Orientation", 2000, NULL, 4, NULL);
     xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", 3000, NULL, 3, NULL);
-    xTaskCreate(&CommunicationTask, "Communication", 6000, NULL, 4, NULL);
+    xTaskCreate(&communicationTask, "Communication", 6000, NULL, 4, NULL);
 
     ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
 }

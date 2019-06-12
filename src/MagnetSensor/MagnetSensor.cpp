@@ -17,7 +17,7 @@ namespace magnetsens {
      * @brief
      *
      */
-    void Init() {
+    void init() {
         ESP_LOGI(MAG_TAG, "Initialising Magnet Sensor...");
         i2c_port_t Port = I2C_NUM_0;
         gpio_num_t sda = GPIO_NUM_21;
@@ -39,7 +39,7 @@ namespace magnetsens {
      * @brief
      *  Calibrate Magnet sensor
      */
-    void Calibrate() {
+    void calibrate() {
         ESP_LOGI(MAG_TAG, "calibrating...");
     }
 
@@ -50,7 +50,7 @@ namespace magnetsens {
      * @return float
      *
      */
-    float GetRaw() {
+    float getRaw() {
         float val;
         uint8_t raw[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         uint8_t MagReg = 0x28;
@@ -66,7 +66,7 @@ namespace magnetsens {
      *
      * @return float
      */
-    float GetAngle() {
+    float getAngle() {
         // Nicht ein wirklicher Rückgabewert!!!!!!!
         // nur da, weil der eigentliche Code noch nicht geschrieben wurde!!!!!!
         return 2.71;

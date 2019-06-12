@@ -19,7 +19,7 @@
     do { \
         auto errCode = (check);\
         if (errCode) { \
-            utils::logWarn(tag, STRINGIFY(x) " != ERR_OK", errCode, __FILE__, __LINE__); \
+            utils::logWarn(tag, _STRINGIFY(x) " != ERR_OK", errCode, __FILE__, __LINE__); \
             return (errCode); \
         } \
     } while (0)
@@ -27,7 +27,7 @@
 #define ASSERT_RET(check, result, tag) \
     do { \
         if (!(check)) { \
-            utils::logWarn(tag, STRINGIFY(x), -1, __FILE__, __LINE__); \
+            utils::logWarn(tag, _STRINGIFY(x), -1, __FILE__, __LINE__); \
             return (result); \
         } \
     } while (0)
@@ -35,7 +35,7 @@
 #define ASSERT(x, tag) \
     do { \
         if (!(x)) { \
-            utils::logWarn(tag, STRINGIFY(x), -1, __FILE__, __LINE__); \
+            utils::logWarn(tag, _STRINGIFY(x), -1, __FILE__, __LINE__); \
             abort(); \
         } \
     } while (0)

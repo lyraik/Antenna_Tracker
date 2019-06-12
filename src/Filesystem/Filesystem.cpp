@@ -1,7 +1,6 @@
 /**
  * @file Filesystem.cpp
- * @author Dominik Gschwind
- * @brief
+ * @author Dominik Gschwind * @brief
  * @version 0.1
  * @date 2019/06/11
  *
@@ -17,7 +16,7 @@
 namespace fs {
 
     esp_err_t init() {
-        esp_vfs_spiffs_conf_t conf{"", NULL, 3, false};
+        esp_vfs_spiffs_conf_t conf{"", "spiffs", 3, false};
 
         ASSERT_RET_CHECK(esp_vfs_spiffs_register(&conf), LOG_TAG);
 
@@ -45,6 +44,11 @@ namespace fs {
         m_file = fopen(path, mode);
         ASSERT_RET(m_file, false, LOG_TAG);
         return true;
+    }
+
+    bool File::tryOpen(const char* path, mode_t mode) {
+        m_file = fopen(path, mode);
+        return m_file;
     }
 
     void File::close() {
@@ -75,7 +79,7 @@ namespace fs {
         return true;
     }
 
-    bool File::remove(const char* name){
+    bool File::remove(const char* name) {
         ASSERT_RET(::remove(name) == 0, false, LOG_TAG);
         return true;
     }
