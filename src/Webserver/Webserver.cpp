@@ -86,6 +86,7 @@ namespace web {
 
                 // poll for messages until task is notified
                 while (!ulTaskNotifyTake(pdFALSE, 0)) {
+                    
                     mg_mgr_poll(&server->m_mgr, 500);
                 }
 

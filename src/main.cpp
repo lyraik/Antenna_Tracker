@@ -20,6 +20,7 @@
 #include "nvs_flash.h"
 #include "sdkconfig.h"
 #include "soc/rtc_wdt.h"
+#include "driver/adc.h"
 
 #include "math.h"
 
@@ -75,6 +76,8 @@ void orientateTask(void* params) {
     // alle späteren Berechnungen)
     ESP_LOGI(POS_TAG, "triangulating position...");
 
+
+
     magnetsens::Calibrate();
 
     // Fahre einmal herum mit dem Antenna Tracker, lese in jedem Winkel das Magnetfeld ein
@@ -89,16 +92,32 @@ void orientateTask(void* params) {
     }
 
     while (true) {
-        vTaskSuspend(NULL);
+        if ((longitude - GPS::getLong()) > 0) {
 
-        if ((bluetooth::longitude - GPS::getLong()) > 0) {
-            if ((bluetooth::lattitude - GPS::getLat()) > 0) {
-                angle = 90 - atan((bluetooth::lattitude - GPS::getLat()) / (bluetooth::longitude - GPS::getLong()));
-            } else {
-                angle = 90 + atan(-((bluetooth::lattitude - GPS::getLat()) / (bluetooth::longitude - GPS::getLong())));
+            if ((lattitude - GPS::getLat()) > 0) {
+
+                angle = 90 - atan((lattitude - GPS::getLat()) / (longitude - GPS::getLong()));
             }
-        } else {
+            else {
+
+                angle = 90 + atan(-((lattitude - GPS::getLat()) / (longitude - GPS::getLong())));
+            }
+        } 
+        else if ((longitude - GPS::getLong()) < 0) {
+
+            if ((lattitude - GPS::getLat()) > 0) {
+
+                angle = 270 + atan((lattitude - GPS::getLat()) / (longitude - GPS::getLong()));
+            } 
+            else {
+
+                angle = 270 - atan(-((lattitude - GPS::getLat()) / (longitude - GPS::getLong())));
+            }
         }
+
+        motion::stepper::setAxis(angle);
+
+        vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 }
 /**
@@ -129,21 +148,24 @@ void blinkTask(void* pvParameter) {
     }
 }
 
-void communicateTask(void* pvParameter) {
-    bluetooth::enableBluetooth();
+void CommunicationTask(void *pvParameter) {
 
-    // initialize wifi ap
-    wifi::init("Antenna Tracker", "password");
-    // start web server
-    web::init();
+    enableBluetooth();
 
+    wifi::init("Antennatracker", "12345678");
+
+    if (web::init() == ESP_OK) {
+        ESP_LOGI(MAIN_TAG, "\n \n started wifi successfully \n \n");
+    } else {
+        ESP_LOGI(MAIN_TAG, "\n \n start wifi failed \n \n");
+    }
+
+    
     while (true) {
         //  ESP_LOGI(POS_TAG, "no communication!");
-        // vTaskDelay(30000 / portTICK_PERIOD_MS);
-        vTaskSuspend(NULL);
+        vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 }
-
 /**
  * @brief
  *
@@ -155,7 +177,9 @@ void batteryMonitoringTask(void* paramenter) {
      * Initialisiere I2C für ADC's, falls noch nicht initialisiert
      *
      */
-    if (i2c::check != true) {
+
+
+    if (i2c::check ==false) {
         i2c_port_t Port = I2C_NUM_0;
         gpio_num_t sda = GPIO_NUM_21;
         gpio_num_t scl = GPIO_NUM_22;
@@ -163,8 +187,7 @@ void batteryMonitoringTask(void* paramenter) {
     }
     ESP_LOGI(MAIN_TAG, "Connecting to ADCs...");
 
-    while (1) {
-        vTaskSuspend(NULL);
+    while (true) {
         // ESP_LOGI("Battery survailance", "no power problems detected");
     }
 }
@@ -185,10 +208,10 @@ extern "C" void app_main() {
     }
     ESP_ERROR_CHECK(ret);
 
-    xTaskCreate(&blinkTask, "Blink", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
-    xTaskCreate(&orientateTask, "Orientation", 3000, NULL, 1, NULL);
-    xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", 3000, NULL, 1, NULL);
-    xTaskCreate(&communicateTask, "Communication", 3000, NULL, 1, NULL);
+    xTaskCreate(&blinkTask, "Blink", configMINIMAL_STACK_SIZE, NULL, 4, NULL);
+    xTaskCreate(&orientateTask, "Orientation", 2000, NULL, 4, NULL);
+    xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", 3000, NULL, 3, NULL);
+    xTaskCreate(&CommunicationTask, "Communication", 6000, NULL, 4, NULL);
 
     ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
 }

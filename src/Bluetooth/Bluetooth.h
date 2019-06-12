@@ -31,8 +31,6 @@
 
 #include <mavlink/common/mavlink.h>
 
-namespace bluetooth
-{
 
 /******************************Attributes********************************************/
 
@@ -84,5 +82,3 @@ void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param);
 
 // enables and initialises the Bluetooth stack and sets the params
 void enableBluetooth();
-
-}
