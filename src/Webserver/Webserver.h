@@ -16,12 +16,30 @@
 #include <freertos/FreeRTOS.h>
 #include <mongoose/mongoose.h>
 #include "esp_err.h"
+#include "utils/String.h"
 
 namespace web {
     static constexpr const char LOG_TAG[] = "web";
 
+    static constexpr size_t STACK_SIZE = 8192;
+    static constexpr size_t MAX_URI_LENGTH = 1024;
+    static constexpr size_t FILE_SERVE_BUFFER_SIZE = 512;
+    static constexpr size_t FILE_SERVE_MIN_SEND_BUF_SIZE = 50;
+
+
     esp_err_t init();
     esp_err_t deinit();
+
+    struct MimeType {
+        enum Code : uint8_t { TEXT_PLAIN, TEXT_HTML, TEXT_CSS, TEXT_JS, APP_JSON, COUNT };
+
+        utils::StringView fileExt;
+        utils::StringView mimeType;
+
+        static const MimeType* getFromExt(const utils::StringView& fileExt);
+        static const MimeType* getFromMime(const utils::StringView& mime);
+        static const MimeType& getFromCode(Code code);
+    };
 
     class WebServer {
        private:
@@ -37,6 +55,11 @@ namespace web {
 
        private:
         void eventHandler(mg_connection* con, int event, void* ptr);
+
+        void handleRestRequest(mg_connection* con, http_message* msg, const utils::StringView& uri);
+
+       public:
+        enum RequestFlag { REQ_FILE = MG_F_USER_1 };
     };
 
     WebServer* webserver();

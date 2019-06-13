@@ -1,0 +1,13 @@
+{
+    "name": "minmea",
+    "description": "lightweight GPS NMEA 0183 parser library in pure C",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kosma/minmea.git"
+    },
+    "include": "",
+    "build": {
+        "srcFilter": "+<*.h> +<*.c> -<test*> -<example*>",
+        "flags": "-Dtimegm=mktime"
+    }
+}

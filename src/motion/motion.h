@@ -1,4 +1,5 @@
 #include "esp_err.h"
+#include "SPI/SPI.h"
 #include <iostream>
 
 namespace motion {
