@@ -1,15 +1,12 @@
 //Jonas
-#include <iostream>
-#include "GPS.h"
-
 
 #include <stdint.h>
-#include "freertos/FreeTROS.h"
-#include "freetros/task.h"
+#include <freertos/FreeRTOS.h>
 #include "stdlib.h"
 #include "ctype.h"
 #include "math.h"
 #include "esp_log.h"
+#include <driver/uart.h>
 
 #include "minmea.h"
 

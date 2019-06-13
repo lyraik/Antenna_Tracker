@@ -1,4 +1,5 @@
 //I2C Wandler
+/*
 
 #include <stdio.h>
 #include <i2c.h>
@@ -7,12 +8,12 @@
 
 
 
-/*
+
 #include "esp_types.h"
 #include "esp_event.h"
 #include "esp_err.h"
 #include "driver/uart.h"
-*/
+
 
 void driver_i2c_startup();
 
@@ -135,3 +136,5 @@ uint8_t driver_i2c_receive()
   i2c_master_stop(cmd);
   i2c_cmd_link_delete(cmd);
 }
+
+*/

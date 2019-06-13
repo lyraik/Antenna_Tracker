@@ -1,6 +1,8 @@
 #ifndef stepperregisters_H
 #define stepperregisters_H
 
+#include <stdint.h>
+
 //................................Möri........................................
 // SPI
 #define TMC_SPI_CLOCK_DIVIDER SPI_CLOCK_DIV8
@@ -150,7 +152,7 @@
 // CHOPCONF MASKS
 // mask the bits from the values we want to set
 
-const uint32_t TMC_CHOPCONF_MASKS[] = {
+constexpr uint32_t TMC_CHOPCONF_MASKS[] = {
   0b1111UL, // 0 TOFF
   0b111UL,  // 1
   0b11UL,   // 2
@@ -216,7 +218,7 @@ const uint32_t TMC_CHOPCONF_MASKS[] = {
 
 // COOLCONF MASKS
 // mask the bits from the values we want to set
-const int TMC_COOLCONF_MASKS[] = {
+constexpr int TMC_COOLCONF_MASKS[] = {
   0b1111UL, // 0 TMC_COOLCONF_SEMIN
   0b111UL, // 1
   0b11UL, // 2
@@ -267,7 +269,7 @@ const int TMC_COOLCONF_MASKS[] = {
 
 // PWMCONF MASKS
 // mask the bits from the values we want to set
-const int TMC_PWMCONF_MASKS[] = {
+constexpr int TMC_PWMCONF_MASKS[] = {
   0b11111111UL, // 0 TMC_PWMCONF_PWM_AMPL
   0b1111111UL, // 1
   0b111111UL, // 2
