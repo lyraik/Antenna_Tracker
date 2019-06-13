@@ -59,7 +59,7 @@ float getLat()
     minmea_parse_gll(&frame,uart_data);
 
     //Code zum lesen der Lattitude (wird noch geschrieben von Jonas)
-    longitude = frame.lattitude.value;
+    longitude = frame.lattitude;
     return lattitude;
 }
 
@@ -68,12 +68,11 @@ float getLong()
     //Attribut, welches den Longitude Wert erhält
     float longitude = 0;
     struct minmea_sentence_gll frame;
-    char uart_data;
-    uart_data = uart_read_bytes (uart_GPS,UART_NUM_1);
+    char *uart_data = readLine(UART_NUM_1);
     minmea_parse_gll(&frame,uart_data);
 
     //Code zum lesen der Longitude (wird noch geschrieben von Jonas)
-    longitude = frame.longitude.value;
+    longitude = frame.longitude;
     return longitude;
 }
 
@@ -82,6 +81,8 @@ float getAlt()
     //Attribut, welches den Altitude Wert erhält
     float altitude = 0;
     struct minmea_sentence_gga frame;
+    char *uart_data = readLine(UART_NUM_1);
+    minmea_parse_gga(&frame,uart_data);
 
     //Code zum lesen der Altitude (wird noc geschrieben von Jonas)
     longitude = frame.altitude;
