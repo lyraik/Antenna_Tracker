@@ -1,5 +1,7 @@
 /**
  * @file Webserver.cpp
+ * 
+ * @author Dominik Gschwind 
  * @author Dominic Möri (mdomin470@gmail.com)
  * @brief
  * @version 0.1

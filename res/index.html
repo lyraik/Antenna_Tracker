@@ -7,23 +7,38 @@
 
     <style>
         #menu {
-            
+
             list-style-type: none;
 
             margin: 0;
             padding: 0;
-
-         
             background-color: #555555;
-         
+
         }
-        
-        li{
+
+        #vals {
+            position: absolute;
+            left: 400px;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+
+        }
+
+        #statusvals {
+            position: absolute;
+            left: 360px;
+            list-style-type: none;
+
+
+        }
+
+        li {
             float: left;
         }
 
         li a {
-           /* display: block;*/
+            /* display: block;*/
             background-color: #555;
             color: white;
             padding: 8px 130px;
@@ -31,52 +46,184 @@
             border: 0;
         }
 
+        li h3 {
+            background-color: lightblue;
+            color: lightseagreen;
+            padding: 8px 30px;
+            text-decoration: none;
+            border: 0;
+
+        }
+
+        li p {
+            background-color: lightblue;
+            color: lightseagreen;
+            padding: 8px 67px;
+            text-decoration: none;
+            border: 0;
+
+        }
+
         /* Change the link color on hover */
         li a:hover {
-            background-color: lightblue;
+            background-color: lightgreen;
             color: white;
+        }
+
+        #req {
+            position: absolute;
+            left: 800px;
+            top: 21px;
+            background-color: green;
+            border: none;
+            text-align: center;
+            color: white;
+            padding: 15px 32px;
+
+        }
+
+        #req:hover {
+            background-color: rgb(0, 80, 0);
+        }
+
+        #output {
+            float: left;
+        }
+
+        #output th tr {
+            position: relative;
+            top: 120px;
+            /* left:20px; */
+            border: none;
+            color: white;
+            background-color: #555555;
+            /*sets 'padding'*/
         }
     </style>
 
 </head>
 
 <body>
-
-    <!--Menu-->
-
-
-    <ul id="menu">
-        <li><a href="wifi.html">wifi</a></li>
-
-        <li><a href="battery.html">battery</a></li>
-
-
-        <li><a href="system.html">system</a></li>
-
-
-        <li><a href="settings.html">settings</a></li>
-    </ul>
-
     <script>
-        function get() {
-            document.location = "?q=getval";
+        function get(val) {
+            var apiVersion = 1.1;
+            var location = "192.168.4.1/".concat(apiVersion, "/", val);
+            var xr = new XMLHttpRequest();
+            xr.open('POST', location, true);
+            xr.send();
+            var response;
+            xr.addEventListener("readystatechange", function () {
+
+                if (xr.readyState == 4 && xr.status == 200) {
+                    document.log("got response");
+
+                    response = xr.responseText;
+                }
+                else if (xr.readyState == 4 && xr.status == 404) {
+                    document.log("response failed");
+                }
+            }, false);
+
+            if (val == "scan") {
+                document.getElementById("devices").textContent = response;
+            }
         }
     </script>
 
-    <br>
-    
-    <H3>
+    <H3 style="background-color: #555555;background-size: 50px; line-height: 50px; color:white; align-content: center">
         Antenna Tracker
     </H3>
 
-    <input type="button" value="Get Bluetooth devices">
 
-    <p>
-        Connected device: <input type="text">
-    </p>
+    <input id="req" type="button" style="align-self: center" onclick="get('scan')" value="Get Bluetooth devices">
+
+    <!--Menu-->
+    <ul id="menu">
+        <li><a onclick="get(wifi)">wifi</a></li>
+
+        <li><a onclick="get(battery)">battery</a></li>
 
 
+        <li><a onclick="get(system)">system</a></li>
 
+
+        <li><a onclick="get(settings)">settings</a></li>
+    </ul>
+
+    <table id="output">
+        <th>
+            <tr>
+                <p>1</p>
+            </tr>
+            <tr>
+                <p>2</p>
+            </tr>
+            <tr>
+                <p>3</p>
+            </tr>
+            <tr>
+                <p>4</p>
+            </tr>
+        </th>
+    </table>
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+
+    <table>
+        <tr>
+            <th>
+                vertical angle:
+            </th>
+            <th>
+                horizontal angle:
+            </th>
+            <th>
+                longitude:
+            </th>
+            <th>
+                lattitude:
+            </th>
+            <th>
+                altitude:
+            </th>
+        </tr>
+        <tr>
+            <th>
+                1
+            </th>
+            <th>
+                2
+            </th>
+            <th>
+                4
+            </th>
+            <th>
+                5
+            </th>
+            <th>
+                6
+            </th>
+        </tr>
+
+    </table>
 </body>
 
 </html>
