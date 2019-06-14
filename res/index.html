@@ -1,129 +1,53 @@
-<!--
-* @brief
-*index File of the Antenna  tracker with controls
-* @autor
-*   
--->
-
 <!DOCTYPE html>
 
 <html>
 
 <head>
     <title>Antennatracker</title>
-
-    <style>
-        #menu {
-            position: absolute;
-            top: 80px;
-
-            list-style-type: none;
-
-            margin: 0;
-            padding: 0;
-            background-color: #555555;
-
-        }
-
-        #vals {
-            position: absolute;
-            left: 400px;
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        #statusvals {
-            position: absolute;
-            left: 360px;
-            list-style-type: none;
-        }
-
-        li {
-            float: left;
-        }
-
-        li a {
-            /* display: block;*/
-            background-color: #555;
-            color: white;
-            padding: 8px 130px;
-            text-decoration: none;
-            border: 0;
-        }
-
-        #vals {
-
-            position: absolute;
-            left: 500px;
-            top: 150px;
-        }
-
-        #vals tr th {
-            background-color: lightblue;
-            color: lightseagreen;
-            padding: 8px 30px;
-            text-decoration: none;
-            border: 0;
-
-        }
-
-        /* Change the link color on hover */
-        li a:hover {
-            background-color: lightgreen;
-            color: white;
-        }
-
-        #req {
-            position: absolute;
-            left: 800px;
-            top: 21px;
-            background-color: green;
-            border: none;
-            text-align: center;
-            color: white;
-            padding: 15px 32px;
-
-        }
-
-        #req:hover {
-            background-color: rgb(0, 80, 0);
-        }
-
-        #output {
-            float: left;
-        }
-
-        #output tr th {
-            /* left:20px; */
-            border: none;
-            color: white;
-            background-color: #555555;
-            /*sets 'padding'*/
-        }
-
-        #systems {
-            position: absolute;
-            top: 300px;
-            left: 500px;
-        }
-
-        #systems th {
-            padding: 10px 20px;
-            color: white;
-            background-color: red;
-        }
-
-        #systems th:hover {
-            background-color: orangered;
-        }
-    </style>
-
+    <link rel="stylesheet" , type="text/css" , href="style.css">
 </head>
 
 <body style="background-color: #554444">
     <script>
-        function createentry() {
+
+        setInterval(() => {
+            
+           var long = get('position/tracked/longitude');
+           var latt = get('position/tracked/lattitude');
+           var alt  = get('position/tracked/altitude');
+           
+           document.getElementById("long").innerHTML = long.value;
+           document.getElementById("lat").innerHTML = latt.value;
+           document.getElementById("alt").innerHTML = alt.value;
+            
+        }, 200);
+
+        function manualControl() {
+
+            window.alert("you can now control the Antenna Tracker with the arrow keys");
+
+            document.addEventListener('keydown', function (event) {
+
+                if (event.keyCode == 38) {
+                    //keyup
+                    post("api/direction/vertical", JSON.stringify({ writableNumber: '10' }));
+                }
+                else if (event.keyCode == 37) {
+                    //keyleft
+                    post("api/direction/horizontal", JSON.stringify({ writableNumber: '10' }));
+                }
+                else if (event.keyCode == 39) {
+                    post("api/direction/horizontal", JSON.stringify({ writableNumber: '-10' }));
+                    //keyright
+                }
+                else if (event.keyCode == 40) {
+                    post("api/direction/vertical", JSON.stringify({ writableNumber: '-10' }));
+                    //keydown
+                }
+            });
+        }
+
+        function createEntry() {
             var table = document.getElementById("output");
 
             var entry = document.createElement("tr");
@@ -140,13 +64,11 @@
             table.appendChild(entry);
         }
 
-        //    document.onload = createentry();
-
         function get(val) {
-            var apiVersion = 1.1;
-            var location = "/".concat(apiVersion, "/", val);
+            var location = "/api/".concat(val);
             var xr = new XMLHttpRequest();
             xr.open('GET', location, true);
+            xr.setRequestHeader("api-version", 1.1);
             xr.send();
             var response;
             xr.addEventListener("readystatechange", function () {
@@ -154,19 +76,42 @@
                 if (xr.readyState == 4 && xr.status == 200) {
                     console.log("got response");
 
-                    response = xr.responseText;
+                    response = Json.parse(xr.responseText);
+
+                    if (val == "scan") {
+
+                        for (var i = 0; i < response.count; i++) {
+                            var opt = document.createElement('option').setAttribute('value', response.i);
+                            document.getElementById("devices").appendChild(opt);
+                        }
+                    }
                 }
                 else if (xr.readyState == 4 && xr.status == 404) {
                     console.log("response failed");
                 }
             }, false);
+        }
 
-            if (val == "scan") {
-                document.getElementById("devices").textContent = response;
-            }
+        function post(location, obi) {
+            var location = "/api/".concat(location);
+            var xr = new XMLHttpRequest();
+            xr.open('POST', location, true);
+            xr.setRequestHeader("api-version", 1.1);
+            xr.send(JSON.parse(obi));
+            var response;
+            xr.addEventListener("readystatechange", function () {
+
+                if (xr.readyState == 4 && xr.status == 200) {
+                    console.log("got response");
+
+                    response = Json.parse(xr.responseText);
+                }
+                else if (xr.readyState == 4 && xr.status == 404) {
+                    console.log("response failed");
+                }
+            }, false);
         }
     </script>
-
     <H3
         style="width: 1203px; position: absolute; top: 0cm; background-color: #555555;background-size: 50px; line-height: 50px; color:white; align-content: center">
         Antenna Tracker
@@ -174,6 +119,13 @@
 
 
     <input id="req" type="button" style="align-self: center" onclick="get('scan')" value="Get Bluetooth devices">
+
+    <select id="devices">
+    </select>
+
+
+    <input id="manual" type="button" style="align-self: center" onclick="manualControl()"
+        value="activate manual control">
 
     <!--Menu-->
     <ul id="menu">
@@ -188,9 +140,6 @@
 
     <table id="output">
         <tr>
-            <th style="position: absolute; top: 150px; left: 10px; width: 480px;">
-                <p>values: <input type="text" style="border: none; color: white; background-color: rgb(36, 35, 35)"></p>
-            </th>
         </tr>
     </table>
 
@@ -210,6 +159,78 @@
             </th>
             <th>
                 altitude:
+            </th>
+        </tr>
+        <tr>
+            <th>
+                1
+            </th>
+            <th>
+                2
+            </th>
+            <th id = "long">
+                3
+            </th>
+            <th id = "latt">
+                4
+            </th>
+            <th id = "alt">
+                5
+            </th>
+        </tr>
+        <tr>
+            <th>
+                Battery 1 voltage:
+            </th>
+            <th>
+                cell1:
+            </th>
+            <th>
+                cell2:
+            </th>
+
+            <th>
+                cell3:
+            </th>
+
+            <th>
+                cell4:
+            </th>
+        </tr>
+        <tr>
+            <th>
+                1
+            </th>
+            <th>
+                2
+            </th>
+            <th>
+                4
+            </th>
+            <th>
+                5
+            </th>
+            <th>
+                6
+            </th>
+        </tr>
+        <tr>
+            <th>
+                Battery 2 voltage:
+            </th>
+            <th>
+                cell1:
+            </th>
+            <th>
+                cell2:
+            </th>
+
+            <th>
+                cell3:
+            </th>
+
+            <th>
+                cell4:
             </th>
         </tr>
         <tr>

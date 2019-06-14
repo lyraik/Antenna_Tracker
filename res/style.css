@@ -1,0 +1,131 @@
+#menu {
+    position: absolute;
+    top: 80px;
+
+    list-style-type: none;
+
+    margin: 0;
+    padding: 0;
+    background-color: #555555;
+
+}
+
+#vals {
+    position: absolute;
+    left: 400px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#statusvals {
+    position: absolute;
+    left: 360px;
+    list-style-type: none;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    /* display: block;*/
+    background-color: #555;
+    color: white;
+    padding: 8px 130px;
+    text-decoration: none;
+    border: 0;
+}
+
+#vals {
+
+    position: absolute;
+    left: 500px;
+    top: 150px;
+}
+
+#vals tr th {
+    background-color: lightblue;
+    color: lightseagreen;
+    padding: 8px 30px;
+    text-decoration: none;
+    border: 0;
+
+}
+
+/* Change the link color on hover */
+li a:hover {
+    background-color: lightgreen;
+    color: white;
+}
+
+#req {
+    position: absolute;
+    left: 800px;
+    top: 21px;
+    background-color: green;
+    border: none;
+    text-align: center;
+    color: white;
+    padding: 15px 32px;
+
+}
+#req:hover {
+    background-color: rgb(0, 80, 0);
+}
+
+#devices {
+    position: absolute;
+    background-color: #555;
+    left: 1000px;
+    top: 35px;
+    width: 200px;
+    text-align: center;
+}
+
+#manual {
+    position: absolute;
+    left: 20px;
+    top: 150px;
+    background-color: darkred;
+    border: none;
+    text-align: center;
+    color: white;
+    padding: 15px 32px;
+}
+
+#manual:hover {
+    background-color: lightcoral;
+}
+
+#manual:active {
+    background-color: rgb(49, 0, 0);
+}
+
+#output {
+    float: left;
+}
+
+#output tr th {
+    /* left:20px; */
+    border: none;
+    color: white;
+    background-color: #555555;
+    /*sets 'padding'*/
+}
+
+#systems {
+    position: absolute;
+    top: 400px;
+    left: 500px;
+}
+
+#systems th {
+    padding: 10px 20px;
+    color: white;
+    background-color: red;
+}
+
+#systems th:hover {
+    background-color: orangered;
+}
