@@ -32,6 +32,7 @@
             margin: 0;
             padding: 0;
         }
+
         #statusvals {
             position: absolute;
             left: 360px;
@@ -51,8 +52,8 @@
             border: 0;
         }
 
-        #vals{
-            
+        #vals {
+
             position: absolute;
             left: 500px;
             top: 150px;
@@ -92,12 +93,29 @@
         #output {
             float: left;
         }
+
         #output tr th {
             /* left:20px; */
             border: none;
             color: white;
             background-color: #555555;
             /*sets 'padding'*/
+        }
+
+        #systems {
+            position: absolute;
+            top: 300px;
+            left: 500px;
+        }
+
+        #systems th {
+            padding: 10px 20px;
+            color: white;
+            background-color: red;
+        }
+
+        #systems th:hover {
+            background-color: orangered;
         }
     </style>
 
@@ -113,16 +131,16 @@
             row.setAttribute('style', "position: relative; top: 170px ; left: 0px; width: 500px");
             var val = document.createElement("p");
             var inputtag = document.createElement("input");
-            inputtag.setAttribute('type',"text");
-            inputtag.setAttribute('style',"border: none; color: white; background-color: rgb(36, 35, 35)");
+            inputtag.setAttribute('type', "text");
+            inputtag.setAttribute('style', "border: none; color: white; background-color: rgb(36, 35, 35)");
             val.appendChild("inputtag");
             val.innerHTML = "value: ";
             row.appendChild(val);
-            entry.appendChild(row); 
+            entry.appendChild(row);
             table.appendChild(entry);
         }
 
-    //    document.onload = createentry();
+        //    document.onload = createentry();
 
         function get(val) {
             var apiVersion = 1.1;
@@ -171,12 +189,12 @@
     <table id="output">
         <tr>
             <th style="position: absolute; top: 150px; left: 10px; width: 480px;">
-                <p>values: <input type="text" style="border: none; color: white; background-color: rgb(36, 35, 35)"></p> 
+                <p>values: <input type="text" style="border: none; color: white; background-color: rgb(36, 35, 35)"></p>
             </th>
         </tr>
     </table>
 
-    <table id = "vals">
+    <table id="vals">
         <tr>
             <th>
                 vertical angle:
@@ -211,8 +229,35 @@
                 6
             </th>
         </tr>
-
     </table>
+
+    <table id="systems">
+        <tr>
+            <th>
+                <p>ADC</p>
+            </th>
+            <th>
+                <p>Magnetsens</p>
+            </th>
+            <th>
+                <p>WIFI</p>
+            </th>
+            <th>
+                <p>Bluetooth</p>
+            </th>
+            <th>
+                <p>I2C</p>
+            </th>
+            <th>
+                <p>SPI</p>
+            </th>
+            <th>
+                <p>Drohne</p>
+            </th>
+        </tr>
+    </table>
+
+
 </body>
 
 </html>
