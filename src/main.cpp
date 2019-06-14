@@ -85,6 +85,7 @@ void orientationTask(void* params) {
     // und finde den Winkel mit dem grössten Wert
     for (int i = 0; i < 360; i++) {
         motion::stepper::setAxis(i);
+        vTaskDelay(10 / portTICK_PERIOD_MS);
         magbuff[i] = magnetsens::getRaw();
 
         if (magbuff[i] >= magbuff[north]) {
@@ -109,7 +110,7 @@ void orientationTask(void* params) {
 
         motion::stepper::setAxis(angle);
 
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 /**
@@ -201,7 +202,7 @@ extern "C" void app_main() {
 
     xTaskCreate(&blinkTask, "Blink", configMINIMAL_STACK_SIZE, NULL, 4, NULL);
     xTaskCreate(&orientationTask, "Orientation", 3000, NULL, 4, NULL);
-    xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", 3000, NULL, 3, NULL);
+    xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", 3000, NULL, 4, NULL);
     xTaskCreate(&communicationTask, "Communication", 6000, NULL, 4, NULL);
 
     ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");

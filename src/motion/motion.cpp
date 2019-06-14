@@ -4,9 +4,9 @@ namespace motion {
     namespace servo {
 
         esp_err_t init() {
-
-
-          return ESP_OK;
+            
+            angle = 0;
+            return ESP_OK;
         }
 
         esp_err_t setAxis(float angle, uint8_t velocity, uint8_t acceleration) {
@@ -31,7 +31,7 @@ namespace motion {
 
         esp_err_t setAxis(float angle, uint8_t velocity, uint8_t acceleration) {
             
-            uint16_t buff[4] = {5,5,5,5};
+            uint8_t buff[4] = {5,5,5,5};
 
             SPI::write(64,1,buff);
          

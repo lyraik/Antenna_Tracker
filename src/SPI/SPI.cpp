@@ -2,11 +2,14 @@
 
 namespace SPI {
 
-    spi_device_handle_t spi = NULL;
+    spi_device_handle_t spi;
 
     spi_bus_config_t buscfg;
 
     spi_device_interface_config_t devcfg;
+
+    uint16_t *rxbuffer;
+    spi_transaction_t comm;
 
 
     esp_err_t init(uint8_t miso, uint8_t mosi, uint8_t clk, uint8_t ss) {
@@ -17,7 +20,7 @@ namespace SPI {
             buscfg.sclk_io_num = clk;
             buscfg.quadwp_io_num = -1;
             buscfg.quadhd_io_num = -1;
-            buscfg.max_transfer_sz = 32 * 8; // in bits (this is for 32 bytes. adjust as needed)
+            buscfg.max_transfer_sz = (4 * 8); // in bits (this is for 4 bytes. adjust as needed)
         
 
             devcfg.clock_speed_hz = 1000000; // this is for 1MHz. adjust as needed
@@ -25,8 +28,10 @@ namespace SPI {
             devcfg.spics_io_num = ss;
             devcfg.queue_size = 3; // how many transactions will be queued at once
         
-
-        if (spi_bus_initialize(HSPI_HOST, &buscfg, 1) != ESP_OK) {
+            //uint32_t flags_o = ~(SPICOMMON_BUSFLAG_NATIVE_PINS);
+           // spicommon_bus_initialize_io(HSPI_HOST,&buscfg,0,NULL,&flags_o);
+       
+        if (spi_bus_initialize(HSPI_HOST, &buscfg, 0) != ESP_OK) {
             return ESP_FAIL;
         }
 
@@ -34,20 +39,23 @@ namespace SPI {
             return ESP_FAIL;
         }
 
+        comm.flags |= SPI_TRANS_USE_TXDATA;
+        comm.flags |= SPI_TRANS_USE_RXDATA;
+
         return ESP_OK;
     }
 
-    uint16_t *rxbuffer;
-    
-    esp_err_t write(uint8_t addr, uint8_t length, uint16_t *buffer) {
 
+    esp_err_t write(uint8_t addr, uint8_t length, uint8_t *buffer) {        
+        comm.addr = addr;
+        comm.tx_data[0] = *buffer;
+        comm.tx_data[1] = 0;        
+        comm.tx_data[2] = 0;
+        comm.tx_data[3] = 0;
         
-        spi_transaction_t comm;
+        ESP_LOGI("SPI", "Write:\t%d\tto\t%d", *buffer, addr);
 
-        comm.addr = addr, comm.tx_buffer = static_cast<const void *>(buffer);
-        comm.rx_buffer = static_cast<void *>(rxbuffer);
-        spi_device_transmit(spi, &comm);
-
+        spi_device_queue_trans(spi, &comm,10);
         return ESP_OK;
     }
 
