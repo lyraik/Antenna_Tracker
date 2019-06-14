@@ -46,6 +46,7 @@
 #include "Webserver/Wifi.h"
 #include "Filesystem/Filesystem.h"
 
+
 #define MAG_VAL_TAG "Magnetic Sensor value"
 #define MAIN_TAG "Antenna Tracker"
 #define POS_TAG "Positioningstask"
@@ -62,6 +63,7 @@ void orientationTask(void* params) {
     uint16_t angle = 0;
     float magbuff[360];
 
+    motion::stepper::init();
     /**
      *
      * @brief Construct a new magnetsens::Init object
@@ -198,7 +200,7 @@ extern "C" void app_main() {
     fs::init();
 
     xTaskCreate(&blinkTask, "Blink", configMINIMAL_STACK_SIZE, NULL, 4, NULL);
-    xTaskCreate(&orientationTask, "Orientation", 2000, NULL, 4, NULL);
+    xTaskCreate(&orientationTask, "Orientation", 3000, NULL, 4, NULL);
     xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", 3000, NULL, 3, NULL);
     xTaskCreate(&communicationTask, "Communication", 6000, NULL, 4, NULL);
 

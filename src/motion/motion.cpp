@@ -5,6 +5,7 @@ namespace motion {
 
         esp_err_t init() {
 
+
           return ESP_OK;
         }
 
@@ -22,10 +23,18 @@ namespace motion {
     namespace stepper {
 
         esp_err_t init() {
+            
+            
+            SPI::init(23, 12,14,19);
             return ESP_OK;
         }
 
         esp_err_t setAxis(float angle, uint8_t velocity, uint8_t acceleration) {
+            
+            uint16_t buff[4] = {5,5,5,5};
+
+            SPI::write(64,1,buff);
+         
             return ESP_OK;
         }
 

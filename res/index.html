@@ -1,3 +1,10 @@
+<!--
+* @brief
+*index File of the Antenna  tracker with controls
+* @autor
+*   
+-->
+
 <!DOCTYPE html>
 
 <html>
@@ -7,6 +14,8 @@
 
     <style>
         #menu {
+            position: absolute;
+            top: 80px;
 
             list-style-type: none;
 
@@ -22,15 +31,11 @@
             list-style-type: none;
             margin: 0;
             padding: 0;
-
         }
-
         #statusvals {
             position: absolute;
             left: 360px;
             list-style-type: none;
-
-
         }
 
         li {
@@ -46,19 +51,17 @@
             border: 0;
         }
 
-        li h3 {
+        #vals{
+            
+            position: absolute;
+            left: 500px;
+            top: 150px;
+        }
+
+        #vals tr th {
             background-color: lightblue;
             color: lightseagreen;
             padding: 8px 30px;
-            text-decoration: none;
-            border: 0;
-
-        }
-
-        li p {
-            background-color: lightblue;
-            color: lightseagreen;
-            padding: 8px 67px;
             text-decoration: none;
             border: 0;
 
@@ -89,10 +92,7 @@
         #output {
             float: left;
         }
-
-        #output th tr {
-            position: relative;
-            top: 120px;
+        #output tr th {
             /* left:20px; */
             border: none;
             color: white;
@@ -103,24 +103,43 @@
 
 </head>
 
-<body>
+<body style="background-color: #554444">
     <script>
+        function createentry() {
+            var table = document.getElementById("output");
+
+            var entry = document.createElement("tr");
+            var row = document.createElement("th");
+            row.setAttribute('style', "position: relative; top: 170px ; left: 0px; width: 500px");
+            var val = document.createElement("p");
+            var inputtag = document.createElement("input");
+            inputtag.setAttribute('type',"text");
+            inputtag.setAttribute('style',"border: none; color: white; background-color: rgb(36, 35, 35)");
+            val.appendChild("inputtag");
+            val.innerHTML = "value: ";
+            row.appendChild(val);
+            entry.appendChild(row); 
+            table.appendChild(entry);
+        }
+
+    //    document.onload = createentry();
+
         function get(val) {
             var apiVersion = 1.1;
-            var location = "192.168.4.1/".concat(apiVersion, "/", val);
+            var location = "/".concat(apiVersion, "/", val);
             var xr = new XMLHttpRequest();
-            xr.open('POST', location, true);
+            xr.open('GET', location, true);
             xr.send();
             var response;
             xr.addEventListener("readystatechange", function () {
 
                 if (xr.readyState == 4 && xr.status == 200) {
-                    document.log("got response");
+                    console.log("got response");
 
                     response = xr.responseText;
                 }
                 else if (xr.readyState == 4 && xr.status == 404) {
-                    document.log("response failed");
+                    console.log("response failed");
                 }
             }, false);
 
@@ -130,7 +149,8 @@
         }
     </script>
 
-    <H3 style="background-color: #555555;background-size: 50px; line-height: 50px; color:white; align-content: center">
+    <H3
+        style="width: 1203px; position: absolute; top: 0cm; background-color: #555555;background-size: 50px; line-height: 50px; color:white; align-content: center">
         Antenna Tracker
     </H3>
 
@@ -139,55 +159,24 @@
 
     <!--Menu-->
     <ul id="menu">
-        <li><a onclick="get(wifi)">wifi</a></li>
+        <li><a onclick="get('wifi')">wifi</a></li>
 
-        <li><a onclick="get(battery)">battery</a></li>
+        <li><a onclick="get('battery')">battery</a></li>
 
+        <li><a onclick="get('system')">system</a></li>
 
-        <li><a onclick="get(system)">system</a></li>
-
-
-        <li><a onclick="get(settings)">settings</a></li>
+        <li><a onclick="get('settings')">settings</a></li>
     </ul>
 
     <table id="output">
-        <th>
-            <tr>
-                <p>1</p>
-            </tr>
-            <tr>
-                <p>2</p>
-            </tr>
-            <tr>
-                <p>3</p>
-            </tr>
-            <tr>
-                <p>4</p>
-            </tr>
-        </th>
+        <tr>
+            <th style="position: absolute; top: 150px; left: 10px; width: 480px;">
+                <p>values: <input type="text" style="border: none; color: white; background-color: rgb(36, 35, 35)"></p> 
+            </th>
+        </tr>
     </table>
 
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-
-
-    <table>
+    <table id = "vals">
         <tr>
             <th>
                 vertical angle:

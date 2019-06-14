@@ -37,11 +37,15 @@ namespace SPI {
         return ESP_OK;
     }
 
-    esp_err_t write(uint8_t addr, uint8_t length, uint8_t *buffer) {
+    uint16_t *rxbuffer;
+    
+    esp_err_t write(uint8_t addr, uint8_t length, uint16_t *buffer) {
+
+        
         spi_transaction_t comm;
 
         comm.addr = addr, comm.tx_buffer = static_cast<const void *>(buffer);
-
+        comm.rx_buffer = static_cast<void *>(rxbuffer);
         spi_device_transmit(spi, &comm);
 
         return ESP_OK;
