@@ -1,3 +1,6 @@
 [submodule "lib/etl"]
 	path = lib/etl
 	url = https://github.com/ETLCPP/etl.git
+[submodule "lib/cJSON/cJSON"]
+	path = lib/cJSON/cJSON
+	url = https://github.com/DaveGamble/cJSON.git

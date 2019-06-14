@@ -42,14 +42,14 @@
 // Motor Reccourcen
 #include "Motion/Motion.h"
 
+#include "Filesystem/Filesystem.h"
+#include "System.h"
 #include "Webserver/Webserver.h"
 #include "Webserver/Wifi.h"
-#include "Filesystem/Filesystem.h"
 
-
-#define MAG_VAL_TAG "Magnetic Sensor value"
-#define MAIN_TAG "Antenna Tracker"
-#define POS_TAG "Positioningstask"
+#define MAG_VAL_TAG "magnet"
+#define MAIN_TAG "main"
+#define POS_TAG "pos"
 
 /**
  * @brief
@@ -199,6 +199,7 @@ extern "C" void app_main() {
     ESP_ERROR_CHECK(ret);
 
     fs::init();
+    sys::inst().load();
 
     xTaskCreate(&blinkTask, "Blink", configMINIMAL_STACK_SIZE, NULL, 4, NULL);
     xTaskCreate(&orientationTask, "Orientation", 3000, NULL, 4, NULL);

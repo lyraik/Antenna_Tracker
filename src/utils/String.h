@@ -16,6 +16,7 @@
 #include <mem.h>
 #include <stddef.h>
 #include <string.h>
+#include "Utils.h"
 
 namespace utils {
 
@@ -59,29 +60,40 @@ namespace utils {
         static void defaultDestructor(char* data) {
             delete[] data;
         }
+        static void freeDestructor(char* data) {
+            free(data);
+        }
 
        public:
         Destructor dtor;
         size_t capacity;
 
-        String(const String&) = default;
-        String(String&&) = default;
+        String(const String& obj) : StringView((const char*)obj.str, obj.length), dtor(nullptr), capacity(0) {}
+        String(String&& obj) : StringView((const char*)obj.str, obj.length), dtor(obj.dtor), capacity(obj.capacity) {
+            obj.str = nullptr;
+            obj.dtor = nullptr;
+        }
 
         String() : StringView(), dtor(nullptr), capacity(0) {}
         String(const StringView& str) : StringView(str), dtor(nullptr), capacity(0) {}
-        String(const char* str, size_t length, size_t cap, Destructor destructor = defaultDestructor) : StringView(str, length), dtor(destructor), capacity(cap) {}
-        String(const char* buf, size_t length, bool copy) {
+        String(char* str, size_t length, size_t cap, Destructor destructor = defaultDestructor) : StringView(str, length), dtor(destructor), capacity(cap) {}
+        String(const char* buf, size_t len, bool copy) {
             if (!copy) {
                 *this = String{StringView{buf, length}};
             } else {
                 if (allocate(length)) {
                     memcpy(str, buf, length);
+                    length = len;
                 }
             }
         }
 
         ~String() {
             destruct();
+        }
+
+        bool empty() {
+            return !str || !(*str);
         }
 
         void clear() {
@@ -91,26 +103,64 @@ namespace utils {
         }
 
         bool allocate(size_t count) {
-            capacity = count;
             str = new char[count + 1];
             if (!str) {
-                *this = String{};
                 return false;
             }
+            capacity = count;
             str[count] = 0;
             dtor = defaultDestructor;
             return true;
         }
 
         void destruct() {
-            if (dtor) {
+            if (dtor && str) {
                 dtor(str);
             }
-            *this = StringView{};
+            str = nullptr;
+            length = 0;
+            capacity = 0;
+            dtor = nullptr;
         }
 
-        String& operator=(const String&) = default;
-        String& operator=(String&&) = default;
+        static String create(const char* str, bool copy = true) {
+            if (!str)
+                return {};
+            size_t length = strlen(str);
+
+            String result{};
+            if (!result.allocate(length))
+                return {};
+            memcpy(result.str, str, length);
+            result.length = length;
+
+            return result;
+        }
+
+        static String create(size_t capacity) {
+            char* buf = new char[capacity + 1];
+            ASSERT_RET(buf, String{}, LOG_TAG);
+            buf[capacity] = 0;
+            return String{buf, capacity, capacity};
+        }
+
+        String& operator=(const String& obj) {
+            str = obj.str;
+            length = obj.length;
+            capacity = 0;
+            dtor = nullptr;
+            return *this;
+        }
+        String& operator=(String&& obj) {
+            str = obj.str;
+            length = obj.length;
+            dtor = obj.dtor;
+            capacity = obj.capacity;
+
+            obj.str = nullptr;
+            obj.dtor = nullptr;
+            return *this;
+        }
     };
 
 }  // namespace utils
