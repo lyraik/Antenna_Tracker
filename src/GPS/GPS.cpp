@@ -1,9 +1,9 @@
 #include "GPS.h"
-
+#include "driver/uart.h"
 
 #include <stdint.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
+//#include <freertos/FreeRTOS.h>
+//#include <freertos/task.h>
 #include "stdlib.h"
 #include "ctype.h"
 #include "math.h"
