@@ -12,8 +12,8 @@
 #include "minmea.h"
 
 //Pins defines
-#define uart_GPS_Tx 34
-#define uart_GPS_RX
+#define uart_GPS_Tx 17
+#define uart_GPS_RX 16
 
 namespace GPS
 {
@@ -49,9 +49,9 @@ void init(uint8_t TxPin, uint8_t RxPin)
 	uart_GPS.stop_bits = UART_STOP_BITS_1;
     uart_GPS.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
     uart_GPS.rx_flow_ctrl_thresh = 120;
-    uart_param_config(UART_NUM_1,&uart_GPS);
-    uart_set_pin (UART_NUM_1,TxPin,RxPin,UART_PIN_NO_CHANGE,UART_PIN_NO_CHANGE);
-    uart_driver_install(UART_NUM_1,2048,2048,10,&uart_QUEUE,NULL); 
+    uart_param_config(UART_NUM_2,&uart_GPS);
+    uart_set_pin (UART_NUM_2,TxPin,RxPin,UART_PIN_NO_CHANGE,UART_PIN_NO_CHANGE);
+    uart_driver_install(UART_NUM_2,2048,2048,10,&uart_QUEUE,NULL); 
 
 }
 
@@ -59,12 +59,12 @@ float getLat()
 {
     //Attribut, welches den Lattitude Wert erhält
     float lattitude = 0;
-     struct minmea_sentence_gll frame;
-    char *uart_data = readLine(UART_NUM_1);
-    minmea_parse_gll(&frame,uart_data);
+     struct minmea_sentence_rmc frame;
+    char *uart_data = readLine(UART_NUM_2);
+    minmea_parse_rmc(&frame,uart_data);
 
     //Code zum lesen der Lattitude (wird noch geschrieben von Jonas)
-    //lattitude = frame.latitude.value; 
+    lattitude = minmea_tocoord(&frame.latitude); 
     return lattitude;
 }
 
@@ -72,12 +72,12 @@ float getLong()
 {
     //Attribut, welches den Longitude Wert erhält
     float longitude = 0;
-    struct minmea_sentence_gll frame;
-    char *uart_data = readLine(UART_NUM_1);
-    minmea_parse_gll(&frame,uart_data);
+    struct minmea_sentence_rmc frame;
+    char *uart_data = readLine(UART_NUM_2);
+    minmea_parse_rmc(&frame,uart_data);
 
     //Code zum lesen der Longitude (wird noch geschrieben von Jonas)
-    //longitude = frame.longitude;
+    longitude = minmea_tocoord(&frame.longitude); 
     return longitude;
 }
 
@@ -86,11 +86,11 @@ float getAlt()
     //Attribut, welches den Altitude Wert erhält
     float altitude = 0;
     struct minmea_sentence_gga frame;
-    char *uart_data = readLine(UART_NUM_1);
+    char *uart_data = readLine(UART_NUM_2);
     minmea_parse_gga(&frame,uart_data);
 
     //Code zum lesen der Altitude (wird noc geschrieben von Jonas)
-    //altitude = frame.altitude; 
+    altitude = minmea_tofloat(&frame.altitude); 
     return altitude;
 }
 

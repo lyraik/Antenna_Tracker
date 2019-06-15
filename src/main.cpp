@@ -63,6 +63,8 @@ void orientationTask(void* params) {
     uint16_t angle = 0;
     float magbuff[360];
 
+    GPS::init(17,16);
+
     motion::stepper::init();
     /**
      *
@@ -107,6 +109,8 @@ void orientationTask(void* params) {
                 angle = 270 - atan(-((lattitude - GPS::getLat()) / (longitude - GPS::getLong())));
             }
         }
+
+        ESP_LOGI("GPS", "lat: %f \t long: %f \t alt: %f", GPS::getLat(), GPS::getLong(), GPS::getAlt());
 
    //     motion::stepper::setAxis(angle);
 
