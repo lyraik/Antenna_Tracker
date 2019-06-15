@@ -38,16 +38,20 @@ void init(uint8_t TxPin, uint8_t RxPin)
 {
     //Code zum Initialisieren des GPS (wird noch geschrieben von Jonas)
     
-/*     uart_config_t uart_GPS;
+    uart_config_t uart_GPS;
+    QueueHandle_t uart_QUEUE;
+
+
+
     uart_GPS.baud_rate = 9600;
     uart_GPS.data_bits = UART_DATA_8_BITS;
 	uart_GPS.parity = UART_PARITY_DISABLE;
 	uart_GPS.stop_bits = UART_STOP_BITS_1;
     uart_GPS.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
     uart_GPS.rx_flow_ctrl_thresh = 120;
-    uart_param_config(UART_NUM_1,uart_GPS);
-    uart_set_pin (uart_GPS,TxPin,RxPin,UART_PIN_NO_CHANGE,UART_PIN_NO_CHANGE);
-    uart_driver_install(uart_GPS,2048,2048,10,17,NULL); */
+    uart_param_config(UART_NUM_1,&uart_GPS);
+    uart_set_pin (UART_NUM_1,TxPin,RxPin,UART_PIN_NO_CHANGE,UART_PIN_NO_CHANGE);
+    uart_driver_install(UART_NUM_1,2048,2048,10,&uart_QUEUE,NULL); 
 
 }
 
