@@ -44,7 +44,7 @@ namespace web {
                     space = con->send_mbuf.size - con->send_mbuf.len;
 
                     // if the send buffer is full, we have to wait until the date is sent
-                    if (space <= FILE_SERVE_MIN_SEND_BUF_SIZE) {
+                    if (space <= FILE_SERVE_MIN_SEND_BUF_SIZE && con->send_mbuf.size >= FILE_SERVE_BUFFER_SIZE) {
                         return false;
                     }
                 }

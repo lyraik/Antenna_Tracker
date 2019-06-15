@@ -33,28 +33,6 @@ namespace web {
 
         WebServer* webServer = nullptr;
 
-        bool matchUri(utils::StringView& uri, utils::StringView match) {
-            if (!uri.str || !uri.length || match.length > uri.length)
-                return false;
-
-            size_t length = std::min(uri.length, match.length);
-
-            for (size_t i = 0; i < length; ++i, ++uri.str, ++match.str) {
-                if (*uri.str != *match.str)
-                    return false;
-            }
-
-            if (match.length == uri.length) {
-                uri.length = 1;
-                --uri.str;
-                return true;
-            } else if (*uri.str == '/') {
-                uri.length -= match.length;
-                return true;
-            }
-            return false;
-        }
-
         const MimeType MIME_TYPES[] = {{utils::StringView{"txt"}, utils::StringView{"text/plain"}},
                                        {utils::StringView{"html\0htm"}, utils::StringView{"text/html"}},
                                        {utils::StringView{"css"}, utils::StringView{"text/css"}},
@@ -180,13 +158,14 @@ namespace web {
 
                 char addr[32];
                 mg_sock_addr_to_str(&con->sa, addr, sizeof(addr), MG_SOCK_STRINGIFY_IP | MG_SOCK_STRINGIFY_PORT);
-                ESP_LOGI(LOG_TAG, "Received http request from %s.", addr);
+                ESP_LOGI(LOG_TAG, "Received http request '%.*s' from %s.", (int)msg->uri.len, msg->uri.p, addr);
 
                 utils::StringView uri{msg->uri.p, msg->uri.len};
-                if (internal::matchUri(uri, internal::REST_URI)) {
+                utils::StringView result;
+                if (uri.startsWith(internal::REST_URI, &result)) {
                     return handleRestRequest(con, msg, uri);
-                } else if (internal::matchUri(uri = utils::StringView{msg->uri.p, msg->uri.len}, internal::WEBPAGE_URI)) {
-                    return internal::FileRequest::handleRequest(con, msg, uri);
+                } else if (uri.startsWith(internal::WEBPAGE_URI, &result)) {
+                    return internal::FileRequest::handleRequest(con, msg, result);
                 }
 
                 mg_http_send_error(con, 404, nullptr);

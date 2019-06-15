@@ -616,8 +616,10 @@ namespace web {
                             arrayIndex = (size_t)index;
                             return currNode;
                         } else if (currNode->children) {
-                            currNode = currNode->children;
                             ++iter;
+                            if (iter == end)
+                                return currNode;
+                            currNode = currNode->children;
                         } else {
                             ++iter;
                             ESP_LOGI(LOG_TAG, "No more children iter_at_end=%.*s '%s'", (int)str.length, str.str, iter == end ? "true" : "false");
@@ -628,10 +630,10 @@ namespace web {
                     } else {
                         ESP_LOGI(LOG_TAG, "Node name mismatch dir='%.*s' node='%s'", (int)str.length, str.str, currNode->name.str);
                         if (currNode->next) {
-                            ESP_LOGI(LOG_TAG, "Going into children");
+                            ESP_LOGI(LOG_TAG, "Gettings next sibling");
                             currNode = currNode->next;
                         } else {
-                            ESP_LOGI(LOG_TAG, "No more children.");
+                            ESP_LOGI(LOG_TAG, "No more siblings.");
                             break;
                         }
                     }
@@ -642,17 +644,24 @@ namespace web {
             cJSON* createJSON(Node* node, cJSON* parent, bool isArrayNode = false, size_t arrayIndex = 0) {
                 if (!node)
                     return nullptr;
-                if(!parent)
+                if (!parent)
                     parent = cJSON_CreateObject();
 
+                ESP_LOGI(LOG_TAG, "Node '%s'", node->name.str);
+
                 if (node->children) {
+                    ESP_LOGI(LOG_TAG, "Node has children %u", node->numChilds);
                     size_t count = 0;
                     Node* child = node->children;
                     for (; child; child = child->next) {
+                        ESP_LOGI(LOG_TAG, "Child node '%s'", child->name.str);
+
                         if (child->children && !static_cast<NodeContainerBase*>(child)->isArray) {
+                            ESP_LOGI(LOG_TAG, "Node is not array");
                             createJSON(child, cJSON_AddObjectToObject(parent, child->name.str));
 
                         } else if (child->children && static_cast<NodeContainerBase*>(child)->isArray) {
+                            ESP_LOGI(LOG_TAG, "Node is array, count elements %u", count);
                             for (uint8_t i = 0; i < count; ++i) {
                                 auto numberStr = utils::String::fromNumber(i);
                                 cJSON* item = cJSON_AddObjectToObject(parent, numberStr.str);
@@ -663,8 +672,10 @@ namespace web {
                                 }
                             }
                         } else if (!child->children) {
+                            ESP_LOGI(LOG_TAG, "Node has no children.");
                             auto item = createJSON(child, cJSON_AddObjectToObject(parent, child->name.str));
                             if (child->name == "count" && cJSON_IsObject(item)) {
+                                ESP_LOGI(LOG_TAG, "Found count node.");
                                 if (count > 0) {
                                     ESP_LOGW(LOG_TAG, "Encountered multiple nodes named 'count'");
                                 }
@@ -680,11 +691,13 @@ namespace web {
                 } else {
                     if (isArrayNode) {
                         ArrayLeafNode* leaf = (ArrayLeafNode*)node;
+                        ESP_LOGI(LOG_TAG, "ArrayLeafNode, '%s'", leaf->name.str);
                         cJSON* item = cJSON_CreateObject();
                         leaf->read(leaf, arrayIndex, item);
                         cJSON_AddItemToObject(parent, leaf->name.str, item);
                     } else {
                         LeafNode* leaf = (LeafNode*)node;
+                        ESP_LOGI(LOG_TAG, "LeafNode, '%s'", leaf->name.str);
                         cJSON* item = cJSON_CreateObject();
                         leaf->read(leaf, item);
                         cJSON_AddItemToObject(parent, leaf->name.str, item);

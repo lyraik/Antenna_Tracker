@@ -39,11 +39,11 @@ namespace utils {
                 return false;
             return strncmp(lhs.str, rhs.str, lhs.length) == 0;
         }
-        friend bool operator!=(const StringView& lhs, const StringView& rhs){
+        friend bool operator!=(const StringView& lhs, const StringView& rhs) {
             return !(lhs == rhs);
         }
 
-        StringView splitAtLastOccurrence(char c) {
+        StringView splitAtLastOccurrence(char c) const {
             char* newStr = str + length - 1;
             for (size_t i = 0; i < length; ++i, --newStr) {
                 if (*newStr == c) {
@@ -56,28 +56,58 @@ namespace utils {
             return StringView{};
         }
 
-        bool empty() {
-            return !str || !(*str);
+        bool startsWith(const StringView& comp, StringView* end = nullptr) const {
+            if (comp.length > length || empty()) {
+                if (end)
+                    *end = StringView{};
+                return false;
+            }
+            if (comp.empty()) {
+                if (end)
+                    *end = *this;
+                return true;
+            }
+
+            const char* iter = str;
+            const char* iterComp = comp.str;
+
+            size_t i = 0;
+            for (; i < comp.length; ++iter, ++iterComp, ++i) {
+                if (*iter != *iterComp)
+                    break;
+            }
+
+            if (i >= comp.length) {
+                if (end)
+                    *end = StringView{iter, length - i};
+                return true;
+            }
+            if (end)
+                *end = StringView{};
+            return false;
+        }
+
+        bool empty() const {
+            return !str || !(*str) || !length;
         }
 
         class Splitter {
            public:
             class Iterator : public virtual std::iterator<std::input_iterator_tag, StringView> {
                 char m_delim;
-                const StringView& m_str;
-                const char* m_end;
-                const char *m_curr, *m_last;
+                const StringView* m_str;
+                size_t m_curr, m_last;
 
                public:
-                Iterator(const StringView& str, char delim) : m_delim(delim), m_str(str), m_end(str.str + str.length), m_curr(str.str), m_last(m_curr) {}
-                Iterator(const StringView& str, const char* curr) : m_delim(0), m_str(str), m_end(str.str + str.length), m_curr(curr), m_last(m_curr) {}
+                Iterator(const StringView& str, char delim) : m_delim(delim), m_str(&str), m_curr(0), m_last(0) {}
+                Iterator(const StringView& str, const char* curr) : m_delim(0), m_str(&str), m_curr(str.length), m_last(str.length) {}
 
                 Iterator& operator++(void) {
-                    if (m_curr < m_end)
+                    if (m_curr < m_str->length)
                         ++m_curr;
                     m_last = m_curr;
-                    for (; m_curr <= m_end; ++m_curr) {
-                        if (*m_curr == m_delim) {
+                    for (; m_curr < m_str->length; ++m_curr) {
+                        if (m_str->str[m_curr] == m_delim) {
                             break;
                         }
                     }
@@ -91,7 +121,7 @@ namespace utils {
                 }
 
                 value_type operator*() const {
-                    return StringView{m_last, (size_t)(m_curr - m_last)};
+                    return StringView{m_str->str + m_last, (size_t)(m_curr - m_last)};
                 }
 
                 friend bool operator==(const Iterator& lhs, const Iterator& rhs) {
@@ -113,7 +143,14 @@ namespace utils {
                 return Iterator{m_str, m_delim};
             }
             Iterator end() {
-                return Iterator{m_str, m_str.str + m_str.length};
+                auto end = Iterator{m_str, m_str.str + m_str.length};
+                auto iter = begin();
+                auto lastNonEmpty = iter;
+                for (; iter != end; ++iter)
+                    if (!(*iter).empty())
+                        lastNonEmpty = iter;
+
+                return iter;
             }
         };
         Splitter split(char delim) {
@@ -187,11 +224,11 @@ namespace utils {
             dtor = nullptr;
         }
 
-        static String fromNumber(size_t num){
+        static String fromNumber(size_t num) {
             auto result = create(10);
             char* str = result.str - 1;
             uint8_t i = 0;
-            for(;num > 0; ++i){
+            for (; num > 0; ++i) {
                 size_t digit = num % 10;
                 num = num / 10;
 
@@ -199,12 +236,12 @@ namespace utils {
                 *str = '0' + digit;
             }
 
-            for(char* begin = result.str; begin < str; ++begin, --str){
+            for (char* begin = result.str; begin < str; ++begin, --str) {
                 char temp = *begin;
                 *begin = *str;
                 *str = temp;
             }
-            result.str[i]  = 0;
+            result.str[i] = 0;
             return result;
         }
 

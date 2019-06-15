@@ -146,7 +146,7 @@ void blinkTask(void* pvParameter) {
 }
 
 void communicationTask(void* pvParameter) {
-    enableBluetooth();
+    //enableBluetooth();
 
     if (wifi::init("Antenna Tracker", "12345678") == ESP_OK) {
         ESP_LOGI(MAIN_TAG, "\n \n started wifi successfully \n \n");
