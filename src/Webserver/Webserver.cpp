@@ -1,7 +1,7 @@
 /**
  * @file Webserver.cpp
- * 
- * @author Dominik Gschwind 
+ *
+ * @author Dominik Gschwind
  * @author Dominic Möri (mdomin470@gmail.com)
  * @brief
  * @version 0.1
@@ -25,10 +25,11 @@ namespace web {
 
     namespace internal {
 
+        RestInterface rest{};
+
         static constexpr const char HTTP_PORT[] = ":80";
         static constexpr const char WEBPAGE_URI[] = "";
         static constexpr const char REST_URI[] = "/api";
-
 
         WebServer* webServer = nullptr;
 
@@ -60,7 +61,6 @@ namespace web {
                                        {utils::StringView{"js\0mjs"}, utils::StringView{"text/javascript"}},
                                        {utils::StringView{"json"}, utils::StringView{"application/json"}}};
 
-        
     }  // namespace internal
 
     const MimeType* MimeType::getFromExt(const utils::StringView& fileExt) {
@@ -201,7 +201,39 @@ namespace web {
     }
 
     void WebServer::handleRestRequest(mg_connection* con, http_message* msg, const utils::StringView& uri) {
-        mg_http_send_error(con, 501, NULL);
+        utils::StringView method{msg->method.p, msg->method.len};
+
+        if (method == "GET") {
+            size_t index = 0;
+            bool arrayNode = false;
+            internal::Node* node = internal::rest.findNode(uri, index, arrayNode, '/');
+
+            if (!node) {
+                return mg_http_send_error(con, 500, "Node not found");
+            }
+
+            cJSON* json = internal::rest.createJSON(node, nullptr, arrayNode, index);
+            if (!node) {
+                return mg_http_send_error(con, 500, "JSON building failed");
+            }
+
+            utils::String jsonStr = cJSON_PrintUnformatted(json);
+            if (jsonStr.empty()) {
+                return mg_http_send_error(con, 500, "JSON stringify failed");
+            }
+
+            mg_send_response_line(con, 200, nullptr);
+            mg_printf(con,
+                      "API-Version: %s\r\n"
+                      "Content-Type: %s\r\n"
+                      "Content-Length: %u\r\n\r\n",
+                      internal::RestInterface::VERSION.str, MimeType::getFromCode(MimeType::APP_JSON).mimeType.str, jsonStr.length);
+            mg_send(con, jsonStr.str, jsonStr.length);
+            return;
+        } else if (method == "POST") {
+        }
+
+        mg_http_send_error(con, 501, nullptr);
     }
 
 }  // namespace web

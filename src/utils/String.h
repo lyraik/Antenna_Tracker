@@ -28,7 +28,7 @@ namespace utils {
         size_t length;
 
         template <size_t N>
-        StringView(const char (&arr)[N]) : str(const_cast<char*>(arr)), length(N - 1) {}
+        constexpr StringView(const char (&arr)[N]) : str(const_cast<char*>(arr)), length(N - 1) {}
 
         StringView(const char* str, size_t length) : str(const_cast<char*>(str)), length(length) {}
 
@@ -38,6 +38,9 @@ namespace utils {
             if (lhs.length != rhs.length)
                 return false;
             return strncmp(lhs.str, rhs.str, lhs.length) == 0;
+        }
+        friend bool operator!=(const StringView& lhs, const StringView& rhs){
+            return !(lhs == rhs);
         }
 
         StringView splitAtLastOccurrence(char c) {
@@ -182,6 +185,27 @@ namespace utils {
             length = 0;
             capacity = 0;
             dtor = nullptr;
+        }
+
+        static String fromNumber(size_t num){
+            auto result = create(10);
+            char* str = result.str - 1;
+            uint8_t i = 0;
+            for(;num > 0; ++i){
+                size_t digit = num % 10;
+                num = num / 10;
+
+                ++str;
+                *str = '0' + digit;
+            }
+
+            for(char* begin = result.str; begin < str; ++begin, --str){
+                char temp = *begin;
+                *begin = *str;
+                *str = temp;
+            }
+            result.str[i]  = 0;
+            return result;
         }
 
         static String create(const char* str, bool copy = true) {

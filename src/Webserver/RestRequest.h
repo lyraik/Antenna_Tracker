@@ -95,8 +95,15 @@ namespace web {
             utils::StringView name;
         };
 
+        struct NodeContainerBase : public Node {
+            bool isArray;
+
+            NodeContainerBase(Node* parent, Node* children, Node* nhxt, uint8_t nc, utils::StringView name, bool isArray)
+                : Node{parent, children, next, nc, name}, isArray(isArray) {}
+        };
+
         template <class... Nodes>
-        struct NodeContainer : public Node {
+        struct NodeContainer : public NodeContainerBase {
             bool isArray;
             using tuple_type = std::tuple<Nodes...>;
             tuple_type nodes;
@@ -107,14 +114,14 @@ namespace web {
             }
 
             NodeContainer(Node* parent, Node* children, Node* nhxt, uint8_t nc, utils::StringView name, bool isArray, tuple_type nodes)
-                : Node{parent, children, next, nc, name}, isArray(isArray), nodes(nodes) {}
+                : NodeContainerBase{parent, children, next, nc, name, isArray}, nodes(nodes) {}
 
             constexpr static uint8_t size = sizeof...(Nodes);
         };
 
         struct LeafNode : public Node {
             using WriteHandler = void (*)(LeafNode*, cJSON*);
-            using ReadHandler = cJSON* (*)(LeafNode*);
+            using ReadHandler = void (*)(LeafNode*, cJSON*);
 
             bool readonly;
             WriteHandler write;
@@ -126,7 +133,7 @@ namespace web {
 
         struct ArrayLeafNode : public Node {
             using WriteHandler = void (*)(ArrayLeafNode*, size_t, cJSON*);
-            using ReadHandler = cJSON* (*)(ArrayLeafNode*, size_t);
+            using ReadHandler = void (*)(ArrayLeafNode*, size_t, cJSON*);
 
             bool readonly;
             WriteHandler write;
@@ -136,34 +143,238 @@ namespace web {
                 : Node{parent, children, next, nc, name}, readonly(readonly), write(wh), read(rh) {}
         };
 
-        cJSON* createNumber(double num, bool reaonly, ValueType type) {
-            auto* json = cJSON_CreateObject();
-            cJSON_AddNumberToObject(json, "value", num);
-            cJSON_AddStringToObject(json, "type", "Number");
-            cJSON_AddFalseToObject(json, "readonly");
-            cJSON_AddNumberToObject(json, "unit", (double)type);
-            return json;
+        void createNumber(double num, bool reaonly, ValueType type, cJSON* parent) {
+            cJSON_AddNumberToObject(parent, "value", num);
+            cJSON_AddStringToObject(parent, "type", "Number");
+            cJSON_AddFalseToObject(parent, "readonly");
+            cJSON_AddNumberToObject(parent, "unit", (double)type);
         }
-        cJSON* createString(const char* str, bool reaonly, ValueType type) {
-            auto* json = cJSON_CreateObject();
-            cJSON_AddStringToObject(json, "value", str);
-            cJSON_AddStringToObject(json, "type", "Number");
-            cJSON_AddFalseToObject(json, "readonly");
-            cJSON_AddNumberToObject(json, "unit", (double)type);
-            return json;
+        void createString(const char* str, bool reaonly, ValueType type, cJSON* parent) {
+            cJSON_AddStringToObject(parent, "value", str);
+            cJSON_AddStringToObject(parent, "type", "Number");
+            cJSON_AddFalseToObject(parent, "readonly");
+            cJSON_AddNumberToObject(parent, "unit", (double)type);
         }
 
-        cJSON* handleRead(LeafNode* node) {
-            return createNumber(0.0, true, TYPE_ANGLE_ACCEL);
+        void handleRead(LeafNode* node, cJSON* parent) {
+            if (!node)
+                return;
+            switch (node->numChilds) {
+                case LN_DIR_REF: {
+                    break;
+                }
+                case LN_DIR_VERT: {
+                    break;
+                }
+                case LN_DIR_HORIZ: {
+                    break;
+                }
+                case LN_POS_T_LONG: {
+                    break;
+                }
+                case LN_POS_T_LAT: {
+                    break;
+                }
+                case LN_POS_T_ALT: {
+                    break;
+                }
+                case LN_POS_D_LONG: {
+                    break;
+                }
+                case LN_POS_D_LAT: {
+                    break;
+                }
+                case LN_POS_D_ALT: {
+                    break;
+                }
+                case LN_BT_LIST_COUNT: {
+                    break;
+                }
+                case LN_BT_SET: {
+                    break;
+                }
+                case LN_WIFI_CONS_COUNT: {
+                    break;
+                }
+                case LN_WIFI_SSID: {
+                    break;
+                }
+                case LN_WIFI_PASSWD: {
+                    break;
+                }
+                case LN_BAT_COUNT: {
+                    break;
+                }
+                case LN_SYS_DBG_TOTMEM: {
+                    break;
+                }
+                case LN_SYS_DBG_USEMEM: {
+                    break;
+                }
+                case LN_SYS_DBG_PROCS: {
+                    break;
+                }
+                case LN_SYS_VER: {
+                    break;
+                }
+                case LN_SYS_RUN: {
+                    break;
+                }
+                case LN_SYS_LOG: {
+                    break;
+                }
+                case LN_SET_STEP_CPS: {
+                    break;
+                }
+                case LN_SET_STEP_VEL: {
+                    break;
+                }
+                case LN_SET_STEP_ACC: {
+                    break;
+                }
+                case LN_SET_SERV_VEL: {
+                    break;
+                }
+                case LN_SET_SERV_ACC: {
+                    break;
+                }
+            }
+            createNumber(0.0, true, TYPE_ANGLE_ACCEL, parent);
         }
-        void handleWrite(LeafNode* node, cJSON* json) {}
-
-        cJSON* handleReadArray(ArrayLeafNode* node, size_t index) {
-            return createNumber(0.0, true, TYPE_ANGLE_ACCEL);
+        void handleWrite(LeafNode* node, cJSON* json) {
+            if (!node)
+                return;
+            switch (node->numChilds) {
+                case LN_DIR_REF: {
+                    break;
+                }
+                case LN_DIR_VERT: {
+                    break;
+                }
+                case LN_DIR_HORIZ: {
+                    break;
+                }
+                case LN_POS_T_LONG: {
+                    break;
+                }
+                case LN_POS_T_LAT: {
+                    break;
+                }
+                case LN_POS_T_ALT: {
+                    break;
+                }
+                case LN_POS_D_LONG: {
+                    break;
+                }
+                case LN_POS_D_LAT: {
+                    break;
+                }
+                case LN_POS_D_ALT: {
+                    break;
+                }
+                case LN_BT_LIST_COUNT: {
+                    break;
+                }
+                case LN_BT_SET: {
+                    break;
+                }
+                case LN_WIFI_CONS_COUNT: {
+                    break;
+                }
+                case LN_WIFI_SSID: {
+                    break;
+                }
+                case LN_WIFI_PASSWD: {
+                    break;
+                }
+                case LN_BAT_COUNT: {
+                    break;
+                }
+                case LN_SYS_DBG_TOTMEM: {
+                    break;
+                }
+                case LN_SYS_DBG_USEMEM: {
+                    break;
+                }
+                case LN_SYS_DBG_PROCS: {
+                    break;
+                }
+                case LN_SYS_VER: {
+                    break;
+                }
+                case LN_SYS_RUN: {
+                    break;
+                }
+                case LN_SYS_LOG: {
+                    break;
+                }
+                case LN_SET_STEP_CPS: {
+                    break;
+                }
+                case LN_SET_STEP_VEL: {
+                    break;
+                }
+                case LN_SET_STEP_ACC: {
+                    break;
+                }
+                case LN_SET_SERV_VEL: {
+                    break;
+                }
+                case LN_SET_SERV_ACC: {
+                    break;
+                }
+            }
         }
-        void handleWriteArray(ArrayLeafNode* node, size_t index, cJSON* json) {}
 
-        struct Interface {
+        void handleReadArray(ArrayLeafNode* node, size_t index, cJSON* parent) {
+            switch (node->numChilds) {
+                case AN_BT_LIST_NAME: {
+                    break;
+                }
+                case AN_BT_LIST_UID: {
+                    break;
+                }
+                case AN_WIFI_CONS_ADDR: {
+                    break;
+                }
+                case AN_BAT_VOLT: {
+                    break;
+                }
+                case AN_BAT_CURR: {
+                    break;
+                }
+                case AN_BAT_CONS: {
+                    break;
+                }
+            }
+            createNumber(0.0, true, TYPE_ANGLE_ACCEL, parent);
+        }
+        void handleWriteArray(ArrayLeafNode* node, size_t index, cJSON* json) {
+            switch (node->numChilds) {
+                case AN_BT_LIST_NAME: {
+                    break;
+                }
+                case AN_BT_LIST_UID: {
+                    break;
+                }
+                case AN_WIFI_CONS_ADDR: {
+                    break;
+                }
+                case AN_BAT_VOLT: {
+                    break;
+                }
+                case AN_BAT_CURR: {
+                    break;
+                }
+                case AN_BAT_CONS: {
+                    break;
+                }
+            }
+        }
+
+        struct RestInterface {
+            static constexpr utils::StringView VERSION = "1.1";
+
             using direction_type = NodeContainer<LeafNode, LeafNode, LeafNode>;
 
             using position_inner_type = NodeContainer<LeafNode, LeafNode, LeafNode>;
@@ -207,30 +418,31 @@ namespace web {
                     //-- [ /direction ]
 
                     //-- [ position ] 1
-                    position_type{
-                        &api, &api.get<1>().get<0>(), &api.get<2>(), 2, "position", false,
-                        position_type::tuple_type{
-                            //--  { tracker } 0
-                            position_inner_type{&api.get<1>(), &api.get<1>().get<0>().get<0>(), &api.get<1>().get<1>(), 3, "tracker", false,
-                                                position_inner_type::tuple_type{
-                                                    // longitude (0)
-                                                    LeafNode{&api.get<1>().get<0>(), nullptr, &api.get<1>().get<0>().get<1>(), LN_POS_T_LONG, "longitude", true, handleWrite, handleRead},
-                                                    // lattitude (1)
-                                                    LeafNode{&api.get<1>().get<0>(), nullptr, &api.get<1>().get<0>().get<2>(), LN_POS_T_ALT, "lattitude", true, handleWrite, handleRead},
-                                                    // altitude (2)
-                                                    LeafNode{&api.get<1>().get<0>(), nullptr, nullptr, LN_POS_T_ALT, "altitude", true, handleWrite, handleRead}}},
-                            //-- { /tracker }
-                            //-- { tracked } 1
-                            position_inner_type{&api.get<1>(), &api.get<1>().get<1>().get<0>(), nullptr, 3, "tracked", false,
-                                                position_inner_type::tuple_type{
-                                                    // longitude (0)
-                                                    LeafNode{&api.get<1>().get<1>(), nullptr, &api.get<1>().get<1>().get<1>(), LN_POS_D_LONG, "longitude", true, handleWrite, handleRead},
-                                                    // lattitude (1)
-                                                    LeafNode{&api.get<1>().get<1>(), nullptr, &api.get<1>().get<1>().get<2>(), LN_POS_D_LAT, "lattitude", true, handleWrite, handleRead},
-                                                    // altitude (2)
-                                                    LeafNode{&api.get<1>().get<1>(), nullptr, nullptr, LN_POS_D_ALT, "altitude", true, handleWrite, handleRead}}}
-                            //-- { /tracked }
-                        }},
+                    position_type{&api, &api.get<1>().get<0>(), &api.get<2>(), 2, "position", false,
+                                  position_type::tuple_type{
+                                      //--  { tracker } 0
+                                      position_inner_type{
+                                          &api.get<1>(), &api.get<1>().get<0>().get<0>(), &api.get<1>().get<1>(), 3, "tracker", false,
+                                          position_inner_type::tuple_type{
+                                              // longitude (0)
+                                              LeafNode{&api.get<1>().get<0>(), nullptr, &api.get<1>().get<0>().get<1>(), LN_POS_T_LONG, "longitude", true, handleWrite, handleRead},
+                                              // lattitude (1)
+                                              LeafNode{&api.get<1>().get<0>(), nullptr, &api.get<1>().get<0>().get<2>(), LN_POS_T_ALT, "lattitude", true, handleWrite, handleRead},
+                                              // altitude (2)
+                                              LeafNode{&api.get<1>().get<0>(), nullptr, nullptr, LN_POS_T_ALT, "altitude", true, handleWrite, handleRead}}},
+                                      //-- { /tracker }
+                                      //-- { tracked } 1
+                                      position_inner_type{
+                                          &api.get<1>(), &api.get<1>().get<1>().get<0>(), nullptr, 3, "tracked", false,
+                                          position_inner_type::tuple_type{
+                                              // longitude (0)
+                                              LeafNode{&api.get<1>().get<1>(), nullptr, &api.get<1>().get<1>().get<1>(), LN_POS_D_LONG, "longitude", true, handleWrite, handleRead},
+                                              // lattitude (1)
+                                              LeafNode{&api.get<1>().get<1>(), nullptr, &api.get<1>().get<1>().get<2>(), LN_POS_D_LAT, "lattitude", true, handleWrite, handleRead},
+                                              // altitude (2)
+                                              LeafNode{&api.get<1>().get<1>(), nullptr, nullptr, LN_POS_D_ALT, "altitude", true, handleWrite, handleRead}}}
+                                      //-- { /tracked }
+                                  }},
                     //--   [ /position ]
 
                     //--    [ bluetooth ] 2
@@ -238,21 +450,22 @@ namespace web {
                         &api, &api.get<2>().get<0>(), &api.get<3>(), 2, "bluetooth", false,
                         bluetooth_type::tuple_type{
                             //--    { list } 0
-                            bt_list_type{&api.get<2>(), &api.get<2>().get<0>().get<0>(), &api.get<2>().get<1>(), 2, "list", false,
-                                         bt_list_type::tuple_type{
-                                             //--   <count> 0
-                                             LeafNode{&api.get<2>().get<0>(), nullptr, &api.get<2>().get<0>().get<1>(), LN_BT_LIST_COUNT, "count", true, handleWrite, handleRead},
-                                             //--   </count>
-                                             //--   <index> 1
-                                             bt_list_arr_type{&api.get<2>().get<0>(), &api.get<2>().get<0>().get<1>().get<0>(), nullptr, 2, "", true,
-                                                              bt_list_arr_type::tuple_type{
-                                                                  // name 0
-                                                                  ArrayLeafNode{&api.get<2>().get<0>().get<1>(), nullptr, &api.get<2>().get<0>().get<1>().get<1>(), AN_BT_LIST_NAME, "name", true,
-                                                                                handleWriteArray, handleReadArray},
-                                                                  // uid 1
-                                                                  ArrayLeafNode{&api.get<1>().get<1>(), nullptr, nullptr, AN_BT_LIST_UID, "uid", true, handleWriteArray, handleReadArray}}}
-                                             //--   </index>
-                                         }},
+                            bt_list_type{
+                                &api.get<2>(), &api.get<2>().get<0>().get<0>(), &api.get<2>().get<1>(), 2, "list", false,
+                                bt_list_type::tuple_type{
+                                    //--   <count> 0
+                                    LeafNode{&api.get<2>().get<0>(), nullptr, &api.get<2>().get<0>().get<1>(), LN_BT_LIST_COUNT, "count", true, handleWrite, handleRead},
+                                    //--   </count>
+                                    //--   <index> 1
+                                    bt_list_arr_type{&api.get<2>().get<0>(), &api.get<2>().get<0>().get<1>().get<0>(), nullptr, 2, "index", true,
+                                                     bt_list_arr_type::tuple_type{
+                                                         // name 0
+                                                         ArrayLeafNode{&api.get<2>().get<0>().get<1>(), nullptr, &api.get<2>().get<0>().get<1>().get<1>(), AN_BT_LIST_NAME, "name",
+                                                                       true, handleWriteArray, handleReadArray},
+                                                         // uid 1
+                                                         ArrayLeafNode{&api.get<1>().get<1>(), nullptr, nullptr, AN_BT_LIST_UID, "uid", true, handleWriteArray, handleReadArray}}}
+                                    //--   </index>
+                                }},
                             //--    { /list }
                             //--   { set } 1
                             {&api.get<2>(), nullptr, nullptr, LN_BT_SET, "set", false, handleWrite, handleRead}
@@ -270,104 +483,218 @@ namespace web {
                                   LeafNode{&api.get<3>(), nullptr, &api.get<3>().get<2>(), LN_WIFI_PASSWD, "password", false, handleWrite, handleRead},
                                   //--   { /password }
                                   //--    { connections } 2
-                                  wifi_cons_type{&api.get<3>(), &api.get<3>().get<2>().get<0>(), nullptr, 2, "list", false,
-                                                 wifi_cons_type::tuple_type{
-                                                     //--   <count> 0
-                                                     LeafNode{&api.get<3>().get<2>(), nullptr, &api.get<3>().get<2>().get<1>(), LN_WIFI_CONS_COUNT, "count", true, handleWrite, handleRead},
-                                                     //--   </count>
-                                                     //--   <index> 1
-                                                     wifi_cons_arr_type{&api.get<3>().get<2>(), &api.get<3>().get<2>().get<1>().get<0>(), nullptr, 1, "", true,
-                                                                        wifi_cons_arr_type::tuple_type{// address 0
-                                                                                                       ArrayLeafNode{&api.get<3>().get<2>().get<1>(), nullptr, nullptr, AN_WIFI_CONS_ADDR,
-                                                                                                                     "address", true, handleWriteArray, handleReadArray}}}
-                                                     //--   </index>
-                                                 }},
+                                  wifi_cons_type{
+                                      &api.get<3>(), &api.get<3>().get<2>().get<0>(), nullptr, 2, "list", false,
+                                      wifi_cons_type::tuple_type{
+                                          //--   <count> 0
+                                          LeafNode{&api.get<3>().get<2>(), nullptr, &api.get<3>().get<2>().get<1>(), LN_WIFI_CONS_COUNT, "count", true, handleWrite, handleRead},
+                                          //--   </count>
+                                          //--   <index> 1
+                                          wifi_cons_arr_type{&api.get<3>().get<2>(), &api.get<3>().get<2>().get<1>().get<0>(), nullptr, 1, "index", true,
+                                                             wifi_cons_arr_type::tuple_type{// address 0
+                                                                                            ArrayLeafNode{&api.get<3>().get<2>().get<1>(), nullptr, nullptr, AN_WIFI_CONS_ADDR,
+                                                                                                          "address", true, handleWriteArray, handleReadArray}}}
+                                          //--   </index>
+                                      }},
                                   //--    { /connections }
                               }},
                     //--    [ /wifi ]
                     //--    [ battery ] 4
-                    battery_type{
-                        &api, &api.get<4>().get<0>(), &api.get<5>(), 2, "battery", false,
-                        battery_type::tuple_type{
-                            //--   { count } 0
-                            LeafNode{&api.get<4>(), nullptr, &api.get<4>().get<1>(), LN_BAT_COUNT, "count", true, handleWrite, handleRead},
-                            //--   { /count }
-                            //--   { index } 1
-                            bat_arr_type{&api.get<4>(), &api.get<4>().get<1>().get<0>(), nullptr, 3, "", true,
-                                         bat_arr_type::tuple_type{
-                                             // voltage 0
-                                             ArrayLeafNode{&api.get<4>().get<1>(), nullptr, &api.get<4>().get<1>().get<1>(), AN_BAT_VOLT, "voltage", true, handleWriteArray, handleReadArray},
-                                             // current 1
-                                             ArrayLeafNode{&api.get<4>().get<1>(), nullptr, &api.get<4>().get<1>().get<2>(), AN_BAT_CURR, "current", true, handleWriteArray, handleReadArray},
-                                             // consumption 2
-                                             ArrayLeafNode{&api.get<4>().get<1>(), nullptr, nullptr, AN_BAT_CONS, "consumption", true, handleWriteArray, handleReadArray}}}
-                            //--   { /index }
-                        }},
+                    battery_type{&api, &api.get<4>().get<0>(), &api.get<5>(), 2, "battery", false,
+                                 battery_type::tuple_type{
+                                     //--   { count } 0
+                                     LeafNode{&api.get<4>(), nullptr, &api.get<4>().get<1>(), LN_BAT_COUNT, "count", true, handleWrite, handleRead},
+                                     //--   { /count }
+                                     //--   { index } 1
+                                     bat_arr_type{&api.get<4>(), &api.get<4>().get<1>().get<0>(), nullptr, 3, "index", true,
+                                                  bat_arr_type::tuple_type{
+                                                      // voltage 0
+                                                      ArrayLeafNode{&api.get<4>().get<1>(), nullptr, &api.get<4>().get<1>().get<1>(), AN_BAT_VOLT, "voltage", true,
+                                                                    handleWriteArray, handleReadArray},
+                                                      // current 1
+                                                      ArrayLeafNode{&api.get<4>().get<1>(), nullptr, &api.get<4>().get<1>().get<2>(), AN_BAT_CURR, "current", true,
+                                                                    handleWriteArray, handleReadArray},
+                                                      // consumption 2
+                                                      ArrayLeafNode{&api.get<4>().get<1>(), nullptr, nullptr, AN_BAT_CONS, "consumption", true, handleWriteArray, handleReadArray}}}
+                                     //--   { /index }
+                                 }},
                     //--    [ /wifi ]
 
                     //-- [ system ] 5
-                    system_type{&api, &api.get<5>().get<0>(), &api.get<6>(), 4, "system", false,
-                                system_type::tuple_type{
-                                    // version (0)
-                                    LeafNode{&api.get<5>(), nullptr, &api.get<5>().get<1>(), LN_SYS_VER, "version", true, handleWrite, handleRead},
-                                    // runtime (1)
-                                    LeafNode{&api.get<5>(), nullptr, &api.get<5>().get<2>(), LN_SYS_RUN, "runtime", true, handleWrite, handleRead},
-                                    // log (2)
-                                    LeafNode{&api.get<5>(), nullptr, &api.get<5>().get<3>(), LN_SYS_LOG, "log", true, handleWrite, handleRead},
-                                    //-- { debug } 3
-                                    sys_debug_type{&api.get<5>(), &api.get<5>().get<3>().get<0>(), nullptr, 3, "debug", false,
-                                                   sys_debug_type::tuple_type{
-                                                       // totalMemory (0)
-                                                       LeafNode{&api.get<5>().get<3>(), nullptr, &api.get<5>().get<3>().get<1>(), LN_SYS_DBG_TOTMEM, "totalMemory", true, handleWrite, handleRead},
-                                                       // usedMemory (1)
-                                                       LeafNode{&api.get<5>().get<3>(), nullptr, &api.get<5>().get<3>().get<2>(), LN_SYS_DBG_USEMEM, "usedMemory", true, handleWrite, handleRead},
-                                                       // processCount (2)
-                                                       LeafNode{&api.get<5>().get<3>(), nullptr, nullptr, LN_SYS_DBG_PROCS, "processCount", true, handleWrite, handleRead}}}
-                                    //-- { /debug }
-                                }},
+                    system_type{
+                        &api, &api.get<5>().get<0>(), &api.get<6>(), 4, "system", false,
+                        system_type::tuple_type{
+                            // version (0)
+                            LeafNode{&api.get<5>(), nullptr, &api.get<5>().get<1>(), LN_SYS_VER, "version", true, handleWrite, handleRead},
+                            // runtime (1)
+                            LeafNode{&api.get<5>(), nullptr, &api.get<5>().get<2>(), LN_SYS_RUN, "runtime", true, handleWrite, handleRead},
+                            // log (2)
+                            LeafNode{&api.get<5>(), nullptr, &api.get<5>().get<3>(), LN_SYS_LOG, "log", true, handleWrite, handleRead},
+                            //-- { debug } 3
+                            sys_debug_type{
+                                &api.get<5>(), &api.get<5>().get<3>().get<0>(), nullptr, 3, "debug", false,
+                                sys_debug_type::tuple_type{
+                                    // totalMemory (0)
+                                    LeafNode{&api.get<5>().get<3>(), nullptr, &api.get<5>().get<3>().get<1>(), LN_SYS_DBG_TOTMEM, "totalMemory", true, handleWrite, handleRead},
+                                    // usedMemory (1)
+                                    LeafNode{&api.get<5>().get<3>(), nullptr, &api.get<5>().get<3>().get<2>(), LN_SYS_DBG_USEMEM, "usedMemory", true, handleWrite, handleRead},
+                                    // processCount (2)
+                                    LeafNode{&api.get<5>().get<3>(), nullptr, nullptr, LN_SYS_DBG_PROCS, "processCount", true, handleWrite, handleRead}}}
+                            //-- { /debug }
+                        }},
                     //--   [ /system ]
 
                     //-- [ settings ] 6
-                    settings_type{
-                        &api, &api.get<6>().get<0>(), nullptr, 2, "settings", false,
-                        settings_type::tuple_type{
-                            //--  { stepper } 0
-                            settings_step_type{&api.get<6>(), &api.get<6>().get<0>().get<0>(), &api.get<6>().get<1>(), 3, "stepper", false,
-                                               settings_step_type::tuple_type{
-                                                   // changePreStep (0)
-                                                   LeafNode{&api.get<6>().get<0>(), nullptr, &api.get<6>().get<0>().get<1>(), LN_SET_STEP_CPS, "changePerStep", false, handleWrite, handleRead},
-                                                   // velocity (1)
-                                                   LeafNode{&api.get<6>().get<0>(), nullptr, &api.get<6>().get<0>().get<2>(), LN_SET_STEP_VEL, "velocity", true, handleWrite, handleRead},
-                                                   // acceleration (2)
-                                                   LeafNode{&api.get<6>().get<0>(), nullptr, nullptr, LN_SET_STEP_ACC, "acceleration", true, handleWrite, handleRead}}},
-                            //-- { /stepper }
-                            //-- { servo } 1
-                            settings_serv_type{&api.get<6>(), &api.get<6>().get<1>().get<0>(), nullptr, 2, "servo", false,
-                                               settings_serv_type::tuple_type{
-                                                   // velocity (0)
-                                                   LeafNode{&api.get<6>().get<1>(), nullptr, &api.get<6>().get<1>().get<1>(), LN_SET_SERV_VEL, "velocity", true, handleWrite, handleRead},
-                                                   // acceleration (1)
-                                                   LeafNode{&api.get<6>().get<1>(), nullptr, nullptr, LN_SET_SERV_ACC, "acceleration", true, handleWrite, handleRead}}}
-                            //-- { /servo }
-                        }}
+                    settings_type{&api, &api.get<6>().get<0>(), nullptr, 2, "settings", false,
+                                  settings_type::tuple_type{
+                                      //--  { stepper } 0
+                                      settings_step_type{&api.get<6>(), &api.get<6>().get<0>().get<0>(), &api.get<6>().get<1>(), 3, "stepper", false,
+                                                         settings_step_type::tuple_type{
+                                                             // changePreStep (0)
+                                                             LeafNode{&api.get<6>().get<0>(), nullptr, &api.get<6>().get<0>().get<1>(), LN_SET_STEP_CPS, "changePerStep", false,
+                                                                      handleWrite, handleRead},
+                                                             // velocity (1)
+                                                             LeafNode{&api.get<6>().get<0>(), nullptr, &api.get<6>().get<0>().get<2>(), LN_SET_STEP_VEL, "velocity", true,
+                                                                      handleWrite, handleRead},
+                                                             // acceleration (2)
+                                                             LeafNode{&api.get<6>().get<0>(), nullptr, nullptr, LN_SET_STEP_ACC, "acceleration", true, handleWrite, handleRead}}},
+                                      //-- { /stepper }
+                                      //-- { servo } 1
+                                      settings_serv_type{&api.get<6>(), &api.get<6>().get<1>().get<0>(), nullptr, 2, "servo", false,
+                                                         settings_serv_type::tuple_type{
+                                                             // velocity (0)
+                                                             LeafNode{&api.get<6>().get<1>(), nullptr, &api.get<6>().get<1>().get<1>(), LN_SET_SERV_VEL, "velocity", true,
+                                                                      handleWrite, handleRead},
+                                                             // acceleration (1)
+                                                             LeafNode{&api.get<6>().get<1>(), nullptr, nullptr, LN_SET_SERV_ACC, "acceleration", true, handleWrite, handleRead}}}
+                                      //-- { /servo }
+                                  }}
                     //--   [ /settings ]
                 }
                 // -- </children>
                 /* api end */
             };
 
-            Interface() {}
+            RestInterface() {}
 
-            Node* findNode(utils::StringView uri, char delimitor = '/'){
+            Node* findNode(utils::StringView uri, size_t& arrayIndex, bool& isArrayNode, char delimitor = '/') {
                 Node* currNode = &api;
-                for(auto str : uri.split(delimitor)){
-                    if(str.empty()) continue;
+                arrayIndex = 0;
+                isArrayNode = false;
+                ESP_LOGI(LOG_TAG, "Begin find node '%.*s'", (int)uri.length, uri.str);
 
+                auto range = uri.split(delimitor);
+                auto iter = range.begin();
+                auto end = range.end();
+                while (iter != end) {
+                    utils::StringView str = *iter;
+                    ESP_LOGI(LOG_TAG, "Searching node with name '%.*s'", (int)str.length, str.str);
+                    if (str.empty()) {
+                        ++iter;
+                        ESP_LOGI(LOG_TAG, "Skipping empty string.");
+                        continue;
+                    }
+                    if (currNode->name == str) {
+                        ESP_LOGI(LOG_TAG, "Found node '%.*s'", (int)str.length, str.str);
+                        if (currNode->children && static_cast<NodeContainerBase*>(currNode)->isArray) {
+                            ++iter;
+                            if (iter == end) {
+                                return currNode;
+                            }
+                            str = *iter;
 
+                            // get index from uri
+                            utils::String indexStr = utils::String::create(str.length);
+                            if (indexStr.empty())
+                                return nullptr;
+
+                            memcpy(indexStr.str, str.str, str.length);
+                            char* strEnd;
+                            auto index = strtol(indexStr.str, &strEnd, 10);
+
+                            isArrayNode = true;
+                            arrayIndex = (size_t)index;
+                            return currNode;
+                        } else if (currNode->children) {
+                            currNode = currNode->children;
+                            ++iter;
+                        } else {
+                            ++iter;
+                            ESP_LOGI(LOG_TAG, "No more children iter_at_end=%.*s '%s'", (int)str.length, str.str, iter == end ? "true" : "false");
+                            if (iter == end)
+                                return currNode;
+                            return nullptr;
+                        }
+                    } else {
+                        ESP_LOGI(LOG_TAG, "Node name mismatch dir='%.*s' node='%s'", (int)str.length, str.str, currNode->name.str);
+                        if (currNode->next) {
+                            ESP_LOGI(LOG_TAG, "Going into children");
+                            currNode = currNode->next;
+                        } else {
+                            ESP_LOGI(LOG_TAG, "No more children.");
+                            break;
+                        }
+                    }
                 }
                 return nullptr;
             }
+
+            cJSON* createJSON(Node* node, cJSON* parent, bool isArrayNode = false, size_t arrayIndex = 0) {
+                if (!node)
+                    return nullptr;
+                if(!parent)
+                    parent = cJSON_CreateObject();
+
+                if (node->children) {
+                    size_t count = 0;
+                    Node* child = node->children;
+                    for (; child; child = child->next) {
+                        if (child->children && !static_cast<NodeContainerBase*>(child)->isArray) {
+                            createJSON(child, cJSON_AddObjectToObject(parent, child->name.str));
+
+                        } else if (child->children && static_cast<NodeContainerBase*>(child)->isArray) {
+                            for (uint8_t i = 0; i < count; ++i) {
+                                auto numberStr = utils::String::fromNumber(i);
+                                cJSON* item = cJSON_AddObjectToObject(parent, numberStr.str);
+
+                                Node* element = child->children;
+                                for (; element; element = element->next) {
+                                    createJSON(element, cJSON_AddObjectToObject(item, element->name.str), true, i);
+                                }
+                            }
+                        } else if (!child->children) {
+                            auto item = createJSON(child, cJSON_AddObjectToObject(parent, child->name.str));
+                            if (child->name == "count" && cJSON_IsObject(item)) {
+                                if (count > 0) {
+                                    ESP_LOGW(LOG_TAG, "Encountered multiple nodes named 'count'");
+                                }
+                                cJSON* value = cJSON_GetObjectItemCaseSensitive(item, "value");
+                                if (value && cJSON_IsNumber(value)) {
+                                    count = (size_t)value->valuedouble;
+                                }
+                            }
+                        } else {
+                            ESP_LOGW(LOG_TAG, "Found invalid node '%s'", child->name.str);
+                        }
+                    }
+                } else {
+                    if (isArrayNode) {
+                        ArrayLeafNode* leaf = (ArrayLeafNode*)node;
+                        cJSON* item = cJSON_CreateObject();
+                        leaf->read(leaf, arrayIndex, item);
+                        cJSON_AddItemToObject(parent, leaf->name.str, item);
+                    } else {
+                        LeafNode* leaf = (LeafNode*)node;
+                        cJSON* item = cJSON_CreateObject();
+                        leaf->read(leaf, item);
+                        cJSON_AddItemToObject(parent, leaf->name.str, item);
+                    }
+                }
+                return parent;
+            }
         };
+
+        extern RestInterface rest;
 
     }  // namespace internal
 }  // namespace web
