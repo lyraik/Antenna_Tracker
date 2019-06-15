@@ -45,8 +45,8 @@ li a {
 }
 
 #vals tr th {
-    background-color: lightblue;
-    color: lightseagreen;
+    background-color: #555;
+    color: white;
     padding: 8px 30px;
     text-decoration: none;
     border: 0;
@@ -71,7 +71,7 @@ li a:hover {
 
 }
 #req:hover {
-    background-color: rgb(0, 80, 0);
+    background-color: lightgreen;
 }
 
 #devices {
@@ -85,7 +85,7 @@ li a:hover {
 
 #manual {
     position: absolute;
-    left: 20px;
+    left: 100px;
     top: 150px;
     background-color: darkred;
     border: none;
@@ -124,6 +124,41 @@ li a:hover {
     padding: 10px 20px;
     color: white;
     background-color: red;
+}
+
+#compNeedle {
+    position: absolute;
+    top: 300px;
+    left: 153px;
+}
+
+#heightNeedle {
+    position: absolute;
+    top: 300px;
+    left: 385px;
+
+}
+
+#levelbar {
+    position: absolute;
+    top: 40px;
+    left: 370px;
+}
+
+#progressbar {
+    position: absolute;
+    top: 478px;
+    left: 402px;
+}
+
+
+
+
+#circle {
+    position: absolute;
+    top: 200px;
+    left: 50px;
+
 }
 
 #systems th:hover {
