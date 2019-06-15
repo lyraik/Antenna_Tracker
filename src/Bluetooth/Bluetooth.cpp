@@ -102,7 +102,7 @@ void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param) {
 
                     ESP_LOGI(SPP_TAG, "Hearbeat");
                 } else if (msg.msgid == 109) {
-                    ESP_LOGI(SPP_TAG, "no device connected");
+          //          ESP_LOGI(SPP_TAG, "no device connected");
                 }
             }
         }

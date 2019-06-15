@@ -11,15 +11,15 @@
     <script>
 
         setInterval(() => {
-            
-           var long = get('position/tracked/longitude');
-           var latt = get('position/tracked/lattitude');
-           var alt  = get('position/tracked/altitude');
-           
-           document.getElementById("long").innerHTML = long.value;
-           document.getElementById("lat").innerHTML = latt.value;
-           document.getElementById("alt").innerHTML = alt.value;
-            
+
+            var long = get('position/tracked/longitude');
+            var latt = get('position/tracked/lattitude');
+            var alt = get('position/tracked/altitude');
+
+            document.getElementById("long").innerHTML = long.value;
+            document.getElementById("lat").innerHTML = latt.value;
+            document.getElementById("alt").innerHTML = alt.value;
+
         }, 200);
 
         function manualControl() {
@@ -138,6 +138,17 @@
         <li><a onclick="get('settings')">settings</a></li>
     </ul>
 
+
+    <!--Images-->
+    <div id="images">
+        <img id="circle" src="img/circle360.bmp">
+        <img id="compNeedle" src="img/compNeedle.bmp" width="100" height="100">
+        <img id = "levelbar" src = "img/levelbar.png" width="50" height="500">
+        <img id = "progressbar" src = "img/progressBar.png" width="10" height="50">
+        <img id="heightNeedle" src="img/compNeedle100.png" width="50" height="50" >
+        
+    </div>
+
     <table id="output">
         <tr>
         </tr>
@@ -168,13 +179,13 @@
             <th>
                 2
             </th>
-            <th id = "long">
+            <th id="long">
                 3
             </th>
-            <th id = "latt">
+            <th id="latt">
                 4
             </th>
-            <th id = "alt">
+            <th id="alt">
                 5
             </th>
         </tr>

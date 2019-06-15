@@ -48,7 +48,7 @@ static uint8_t peer_bdname_len;
 // Gelesener Name vom Gerät -> wird mit dem remote_device name verglichen um zu sehen ob eine Verbindung aufgebaut werden soll
 static char peer_bdname[ESP_BT_GAP_MAX_BDNAME_LEN + 1];
 //Erwarteter Name vom fernen Gerät
-static const char remote_device_name[] = "Crossfire 2771";
+static const char remote_device_name[] = "Crossfire 7564";
 //Anfrage modus: Art der Anfrage
 static const esp_bt_inq_mode_t inq_mode = ESP_BT_INQ_MODE_GENERAL_INQUIRY;
 
