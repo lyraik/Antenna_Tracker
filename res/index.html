@@ -7,7 +7,7 @@
     <link rel="stylesheet" , type="text/css" , href="style.css">
 </head>
 
-<body style="background-color: #554444">
+<body style="background-color: #272727">
     <script>
 
         setInterval(() => {
@@ -15,10 +15,16 @@
             var long = get('position/tracked/longitude');
             var latt = get('position/tracked/lattitude');
             var alt = get('position/tracked/altitude');
-
+            
+            var angleHorizontal = get('/api/direction/horizontal');
+            var angleVertical = get('/api/direction/vertical');
+            
             document.getElementById("long").innerHTML = long.value;
             document.getElementById("lat").innerHTML = latt.value;
             document.getElementById("alt").innerHTML = alt.value;
+            
+            var rotateangle = "rotate(".concat(angleHorizontal).concat("deg)");
+            document.getElementById("compNeedle").style.transform = rotateangle;
 
         }, 200);
 
@@ -142,7 +148,7 @@
     <!--Images-->
     <div id="images">
         <img id="circle" src="img/circle360.bmp">
-        <img id="compNeedle" src="img/compNeedle.bmp" width="100" height="100">
+        <img id="compNeedle" style="transform: rotate(0deg)" src="img/compNeedle.bmp" width="100" height="100">
         <img id = "levelbar" src = "img/levelbar.png" width="50" height="500">
         <img id = "progressbar" src = "img/progressBar.png" width="10" height="50">
         <img id="heightNeedle" src="img/compNeedle100.png" width="50" height="50" >
