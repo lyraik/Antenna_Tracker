@@ -85,6 +85,8 @@ namespace fs {
             return feof(m_file) != 0;
         }
 
+        size_t length();
+
         size_t read(void* dst, size_t count);
         size_t write(const void* src, size_t count);
 

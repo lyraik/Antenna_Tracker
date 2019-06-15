@@ -84,4 +84,14 @@ namespace fs {
         return true;
     }
 
+    size_t File::length() {
+        ASSERT_RET(fseek(m_file, 0, SEEK_END) == 0, 0, LOG_TAG);
+
+        long int size = ftell(m_file);
+        rewind();
+
+        ASSERT_RET(size != -1, 0, LOG_TAG);
+        return size;
+    }
+
 }  // namespace fs

@@ -1,3 +1,22 @@
 {
-
+    "direction": {
+        "angleFromNorth": 90
+    },
+    "bluetooth": {
+        "name": "hallo test",
+        "uid": ""
+    },
+    "wifi": {
+        "ssid": "",
+        "password": ""
+    },
+    "stepper": {
+        "changePerStep": 0,
+        "velocity": 0,
+        "acceleration": 0
+    },
+    "servo": {
+        "velocity": 0,
+        "acceleration": 0
+    }
 }

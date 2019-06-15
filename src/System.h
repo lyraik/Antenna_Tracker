@@ -17,6 +17,11 @@
 #include <stddef.h>
 
 namespace sys {
+
+    static constexpr const char LOG_TAG[] = "sys";
+
+    static constexpr const char CONFIG_FILE_PATH[] = "/config.json";
+
     struct Config {
         struct {
             float angleFromNorth;
@@ -30,7 +35,7 @@ namespace sys {
         } bluetooth;
 
         struct {
-            utils::String name;
+            utils::String ssid;
             utils::String password;
         } wifi;
 
@@ -48,6 +53,9 @@ namespace sys {
             float velocity;
             float acceleration;
         } servo;
+
+        void save();
+        void load();
     };
 
     utils::StringView log();
