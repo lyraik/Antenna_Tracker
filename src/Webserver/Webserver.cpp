@@ -19,6 +19,7 @@
 #include <mongoose/mongoose.h>
 
 #include "FileRequest.h"
+#include "RestRequest.h"
 
 namespace web {
 
