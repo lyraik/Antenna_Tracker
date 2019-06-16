@@ -86,7 +86,7 @@ void orientationTask(void* params) {
     // Fahre einmal herum mit dem Antenna Tracker, lese in jedem Winkel das Magnetfeld ein
     // und finde den Winkel mit dem grössten Wert
     for (int i = 0; i < 360; i++) {
-  //      motion::stepper::setAxis(i);
+        motion::stepper::setAxis(i);
         vTaskDelay(10 / portTICK_PERIOD_MS);
         magbuff[i] = magnetsens::getRaw();
 

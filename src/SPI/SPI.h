@@ -22,6 +22,8 @@ namespace SPI
 
     esp_err_t write(uint8_t addr, uint8_t length, uint8_t *buffer);
 
+    esp_err_t read(uint8_t addr, uint8_t command, uint8_t length, uint8_t* buffer);
+
     esp_err_t deinit();
 
 }

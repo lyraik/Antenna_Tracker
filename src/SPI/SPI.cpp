@@ -49,14 +49,28 @@ namespace SPI {
     esp_err_t write(uint8_t addr, uint8_t length, uint8_t *buffer) {        
         comm.addr = addr;
         comm.tx_data[0] = *buffer;
-        comm.tx_data[1] = 0;        
-        comm.tx_data[2] = 0;
-        comm.tx_data[3] = 0;
+        comm.tx_data[1] = *(buffer+1);        
+        comm.tx_data[2] = *(buffer+2);
+        comm.tx_data[3] = *(buffer+3);
         
         ESP_LOGI("SPI", "Write:\t%d\tto\t%d", *buffer, addr);
 
         spi_device_queue_trans(spi, &comm,10);
         return ESP_OK;
+    }
+
+    esp_err_t read(uint8_t addr, uint8_t command, uint8_t length, uint8_t* buffer)
+    {
+        comm.addr = addr;
+        comm.tx_data[0] = command;
+
+        ESP_LOGI("SPI", "read:\t%d\tfrom\t%d\treg\t%d", *buffer, addr, command);
+
+        spi_device_transmit(spi,&comm);
+
+        buffer = comm.tx_data;
+        return ESP_OK;
+
     }
 
     esp_err_t deinit() {
