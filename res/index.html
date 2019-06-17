@@ -25,7 +25,7 @@
             var rotateangle = "rotate(".concat(angleHorizontal).concat("deg)");
             document.getElementById("compNeedle").style.transform = rotateangle;
 
-        }, 200);
+        }, 700);
 
         function manualControl() {
 
@@ -73,7 +73,7 @@
             var location = "/api/".concat(val);
             var xr = new XMLHttpRequest();
             xr.open('GET', location, true);
-            xr.setRequestHeader("api-version", 1.1);
+            xr.setRequestHeader("Api-Version", 1.1);
             xr.send();
             var response;
             xr.addEventListener("readystatechange", function () {

@@ -25,6 +25,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <etl/vector.h>
+#include "utils/String.h"
 
 #include "sys/time.h"
 #include "time.h"
@@ -65,6 +67,9 @@ extern mavlink_status_t status;
 
 extern float lattitude;
 extern float longitude;
+
+extern utils::String bdname;
+
 
 /************************************API's******************************************/
 

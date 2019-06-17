@@ -1,3 +1,14 @@
+/**
+ * @file SPI.h
+ * @author Dominic Möri (mdomin470@gmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2019-06-16
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #include <iostream>
 #include "esp_err.h"
 #include "driver/spi_master.h"

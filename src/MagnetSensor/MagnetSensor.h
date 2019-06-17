@@ -1,3 +1,13 @@
+/**
+ * @file MagnetSensor.h
+ * @author Dominic Möri (mdomin470@gmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2019-06-16
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 // Dieses File enthält Reccourcen für den Magentsensor xy
 #include <driver/gpio.h>
 #include <esp_log.h>

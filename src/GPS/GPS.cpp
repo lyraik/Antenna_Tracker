@@ -1,3 +1,13 @@
+/**
+ * @file GPS.cpp
+ * @author Jonas
+ * @brief 
+ * @version 0.1
+ * @date 2019-06-15
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include "GPS.h"
 #include "driver/uart.h"
 

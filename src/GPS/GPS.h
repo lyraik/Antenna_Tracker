@@ -1,5 +1,13 @@
-//Jonas
-
+/**
+ * @file GPS.h
+ * @author Jonas
+ * @brief 
+ * @version 0.1
+ * @date 2019-06-15
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include <stdint.h>
 #include <freertos/FreeRTOS.h>
 #include "stdlib.h"
