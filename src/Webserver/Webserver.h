@@ -21,7 +21,7 @@
 namespace web {
     static constexpr const char LOG_TAG[] = "web";
 
-    static constexpr size_t STACK_SIZE = 8192;
+    static constexpr size_t STACK_SIZE = 9000;
     static constexpr size_t MAX_URI_LENGTH = 1024;
     static constexpr size_t FILE_SERVE_BUFFER_SIZE = 512;
     static constexpr size_t FILE_SERVE_MIN_SEND_BUF_SIZE = 50;

@@ -17,6 +17,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <iterator>
+#include <type_traits>
 #include "Utils.h"
 
 namespace utils {
@@ -28,23 +29,25 @@ namespace utils {
         size_t length;
 
         template <size_t N>
-        constexpr StringView(const char (&arr)[N]) : str(const_cast<char*>(arr)), length(N - 1) {}
+        constexpr StringView(const char (&arr)[N]) : str((char*)arr), length(N - 1) {}
 
         StringView(const char* str, size_t length) : str(const_cast<char*>(str)), length(length) {}
 
         StringView() : StringView(EMPTY, 0) {}
 
         friend bool operator==(const StringView& lhs, const StringView& rhs) {
-            if (lhs.length != rhs.length)
-                return false;
-            return strncmp(lhs.str, rhs.str, lhs.length) == 0;
+            ESP_LOGI(LOG_TAG, "lhs: %p, %u, %.*s", lhs.str, lhs.length, lhs.length, lhs.str ? lhs.str : "");
+            ESP_LOGI(LOG_TAG, "rhs: %p, %u, %.*s", rhs.str, rhs.length, rhs.length, rhs.str ? rhs.str : "");
+            if (lhs.length == rhs.length)
+                return strncmp(lhs.str, rhs.str, std::min(lhs.length, rhs.length)) == 0;
+            return false;
         }
         friend bool operator!=(const StringView& lhs, const StringView& rhs) {
             return !(lhs == rhs);
         }
 
         StringView splitAtLastOccurrence(char c) const {
-            char* newStr = str + length - 1;
+            const char* newStr = str + length - 1;
             for (size_t i = 0; i < length; ++i, --newStr) {
                 if (*newStr == c) {
                     if (!i)
@@ -88,7 +91,7 @@ namespace utils {
         }
 
         bool empty() const {
-            return !str || !(*str) || !length;
+            return !str || !length;
         }
 
         class Splitter {
@@ -103,14 +106,18 @@ namespace utils {
                 Iterator(const StringView& str, const char* curr) : m_delim(0), m_str(&str), m_curr(str.length), m_last(str.length) {}
 
                 Iterator& operator++(void) {
+                    ESP_LOGI(LOG_TAG, "1.1");
                     if (m_curr < m_str->length)
                         ++m_curr;
+                    ESP_LOGI(LOG_TAG, "1.2");
                     m_last = m_curr;
+                    ESP_LOGI(LOG_TAG, "1.3");
                     for (; m_curr < m_str->length; ++m_curr) {
                         if (m_str->str[m_curr] == m_delim) {
                             break;
                         }
                     }
+                    ESP_LOGI(LOG_TAG, "1.4");
                     return *this;
                 }
 
@@ -121,6 +128,8 @@ namespace utils {
                 }
 
                 value_type operator*() const {
+                    if(m_last >= m_str->length)
+                        return StringView{};
                     return StringView{m_str->str + m_last, (size_t)(m_curr - m_last)};
                 }
 

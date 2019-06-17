@@ -25,8 +25,6 @@ namespace web {
 
     namespace internal {
 
-        RestInterface rest{};
-
         static constexpr const char HTTP_PORT[] = ":80";
         static constexpr const char WEBPAGE_URI[] = "";
         static constexpr const char REST_URI[] = "/api";
@@ -180,23 +178,24 @@ namespace web {
     }
 
     void WebServer::handleRestRequest(mg_connection* con, http_message* msg, const utils::StringView& uri) {
+        mg_http_send_error(con, 501, nullptr);
         utils::StringView method{msg->method.p, msg->method.len};
 
         if (method == "GET") {
             size_t index = 0;
             bool arrayNode = false;
-            internal::Node* node = internal::rest.findNode(uri, index, arrayNode, '/');
+            const internal::Node* node = internal::rest::findNode(uri, index, arrayNode, '/');
 
             if (!node) {
                 return mg_http_send_error(con, 500, "Node not found");
             }
 
-            cJSON* json = internal::rest.createJSON(node, nullptr, arrayNode, index);
+            cJSON* json = internal::rest::createJSON(node, nullptr, arrayNode, index);
             if (!node) {
                 return mg_http_send_error(con, 500, "JSON building failed");
             }
 
-            utils::String jsonStr = cJSON_PrintUnformatted(json);
+            utils::String jsonStr = cJSON_Print(json);
             if (jsonStr.empty()) {
                 return mg_http_send_error(con, 500, "JSON stringify failed");
             }
@@ -206,7 +205,7 @@ namespace web {
                       "API-Version: %s\r\n"
                       "Content-Type: %s\r\n"
                       "Content-Length: %u\r\n\r\n",
-                      internal::RestInterface::VERSION.str, MimeType::getFromCode(MimeType::APP_JSON).mimeType.str, jsonStr.length);
+                      internal::rest::VERSION.str, MimeType::getFromCode(MimeType::APP_JSON).mimeType.str, jsonStr.length);
             mg_send(con, jsonStr.str, jsonStr.length);
             return;
         } else if (method == "POST") {

@@ -53,7 +53,7 @@ namespace SPI {
         comm.tx_data[2] = *(buffer+2);
         comm.tx_data[3] = *(buffer+3);
         
-        ESP_LOGI("SPI", "Write:\t%d\tto\t%d", *buffer, addr);
+        // ESP_LOGI("SPI", "Write:\t%d\tto\t%d", *buffer, addr);
 
         spi_device_queue_trans(spi, &comm,10);
         return ESP_OK;
