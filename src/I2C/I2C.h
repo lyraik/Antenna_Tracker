@@ -58,13 +58,13 @@ namespace i2c {
      * Scl = 22 (Der SCL Pin auf dem Pinout)
      *
      */
-    uint8_t init(i2c_port_t Port, i2c_mode_t Mode, uint32_t Frequency, gpio_num_t Sda, gpio_num_t Scl);
+    int8_t init(i2c_port_t Port, i2c_mode_t Mode, uint32_t Frequency, gpio_num_t Sda, gpio_num_t Scl);
 
     /**
      * @brief deinitialisiert I2C
      * @return uint8_t
      */
-    uint8_t deinit(void);
+    int8_t deinit(void);
 
     /**
      * @brief

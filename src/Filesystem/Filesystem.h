@@ -21,6 +21,7 @@
 
 namespace fs {
     static constexpr const char LOG_TAG[] = "fs";
+    static constexpr size_t MAX_FILES_OPEN = 10;
 
     esp_err_t init();
     esp_err_t deinit();
@@ -52,7 +53,6 @@ namespace fs {
         }
 
         bool open(const char* path, mode_t mode);
-        bool tryOpen(const char* path, mode_t mode);
 
         bool valid(){return m_file;}
 
@@ -92,6 +92,19 @@ namespace fs {
 
         static bool rename(const char* oldName, const char* newName);
         static bool remove(const char* name);
+
+        static bool hasError(){
+            return errno != 0;
+        }
+        static utils::StringView getError(){
+            if(errno == 0) return {};
+            return utils::StringView{strerror(errno)};
+        }
+        static void logError(){
+            if(hasError()){
+                ESP_LOGW(LOG_TAG, "File error (%d): %s", errno, strerror(errno));
+            }
+        }
     };
 
 }  // namespace fs

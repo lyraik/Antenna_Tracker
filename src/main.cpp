@@ -96,17 +96,17 @@ void orientationTask(void* params) {
     }
 
     while (true) {
-        if ((longitude - GPS::getLong()) > 0) {
-            if ((lattitude - GPS::getLat()) > 0) {
-                angle = 90 - atan((lattitude - GPS::getLat()) / (longitude - GPS::getLong()));
+        if ((bt::longitude - GPS::getLong()) > 0) {
+            if ((bt::lattitude - GPS::getLat()) > 0) {
+                angle = 90 - atan((bt::lattitude - GPS::getLat()) / (bt::longitude - GPS::getLong()));
             } else {
-                angle = 90 + atan(-((lattitude - GPS::getLat()) / (longitude - GPS::getLong())));
+                angle = 90 + atan(-((bt::lattitude - GPS::getLat()) / (bt::longitude - GPS::getLong())));
             }
-        } else if ((longitude - GPS::getLong()) < 0) {
-            if ((lattitude - GPS::getLat()) > 0) {
-                angle = 270 + atan((lattitude - GPS::getLat()) / (longitude - GPS::getLong()));
+        } else if ((bt::longitude - GPS::getLong()) < 0) {
+            if ((bt::lattitude - GPS::getLat()) > 0) {
+                angle = 270 + atan((bt::lattitude - GPS::getLat()) / (bt::longitude - GPS::getLong()));
             } else {
-                angle = 270 - atan(-((lattitude - GPS::getLat()) / (longitude - GPS::getLong())));
+                angle = 270 - atan(-((bt::lattitude - GPS::getLat()) / (bt::longitude - GPS::getLong())));
             }
         }
 
@@ -146,7 +146,7 @@ void blinkTask(void* pvParameter) {
 }
 
 void communicationTask(void* pvParameter) {
-    enableBluetooth();
+    bt::init();
 
     if (wifi::init("Antenna Tracker", "12345678") == ESP_OK) {
         ESP_LOGI(MAIN_TAG, "\n \n started wifi successfully \n \n");
@@ -208,7 +208,7 @@ extern "C" void app_main() {
     xTaskCreate(&blinkTask, "Blink", configMINIMAL_STACK_SIZE, NULL, 4, NULL);
     xTaskCreate(&orientationTask, "Orientation", 3000, NULL, 4, NULL);
     xTaskCreate(&batteryMonitoringTask, "BatterySurvailance", 3000, NULL, 4, NULL);
-    xTaskCreate(&communicationTask, "Communication", 6000, NULL, 4, NULL);
+    xTaskCreate(&communicationTask, "Communication", 8000, NULL, 4, NULL);
 
     ESP_LOGI(MAIN_TAG, "Welcome to the Antenna tracker Software");
 }

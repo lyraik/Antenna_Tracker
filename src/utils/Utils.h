@@ -21,7 +21,7 @@
 
 #define ASSERT_RET_CHECK(check, tag) \
     do { \
-        auto errCode = (check);\
+        auto errCode = (check); \
         if (errCode) { \
             utils::logWarn(tag, _STRINGIFY(x) " != ERR_OK", errCode, __FILE__, __LINE__); \
             return errCode; \
@@ -48,6 +48,7 @@ namespace utils {
     static constexpr const char LOG_TAG[] = "utils";
 
     void logWarn(const char* tag, const char* check, int32_t errCode, const char* file, uint32_t line);
-}
 
-#endif //_Utils_h_
+}  // namespace utils
+
+#endif  //_Utils_h_

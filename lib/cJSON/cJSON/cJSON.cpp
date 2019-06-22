@@ -1128,7 +1128,7 @@ static utils::String print(const cJSON * const item, cJSON_bool format, const in
             goto fail;
         }
         buffer->buffer = NULL;
-        result = utils::String((char*)printed, buffer->offset - 1, buffer->offset - 1, utils::String::freeDestructor);
+        result = utils::String((char*)printed, buffer->offset - 1, buffer->offset - 1, utils::String::freeDelete);
     }
     else /* otherwise copy the JSON over to a new buffer */
     {
@@ -1143,7 +1143,7 @@ static utils::String print(const cJSON * const item, cJSON_bool format, const in
 
         /* free the buffer */
         hooks->deallocate(buffer->buffer);
-        result = utils::String((char*)printed, length - 1, length -1 , utils::String::freeDestructor);
+        result = utils::String((char*)printed, length - 1, length - 1, utils::String::freeDelete);
     }
 
     return result;
@@ -1200,7 +1200,7 @@ CJSON_PUBLIC(utils::String) cJSON_PrintBuffered(const cJSON *item, int prebuffer
         return {};
     }
 
-    return utils::String((char*)p.buffer, p.length - 1, p.length - 1, utils::String::freeDestructor);
+    return utils::String((char*)p.buffer, p.length - 1, p.length - 1, utils::String::freeDelete);
 }
 
 CJSON_PUBLIC(cJSON_bool) cJSON_PrintPreallocated(cJSON *item, char *buf, const int len, const cJSON_bool fmt)

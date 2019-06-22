@@ -25,21 +25,28 @@ namespace utils {
     struct StringView {
         static constexpr const char* EMPTY = "";
 
-        char* str;
-        size_t length;
+       protected:
+        const char* m_str;
+        size_t m_len;
 
+       public:
+        constexpr StringView() : m_str(EMPTY), m_len(0) {}
         template <size_t N>
-        constexpr StringView(const char (&arr)[N]) : str((char*)arr), length(N - 1) {}
+        constexpr StringView(const char (&arr)[N]) : m_str(arr), m_len(N - 1) {}
+        constexpr StringView(const char* str, size_t length) : m_str(str), m_len(length) {}
 
-        StringView(const char* str, size_t length) : str(const_cast<char*>(str)), length(length) {}
+        explicit StringView(const char* str) : m_str(str), m_len(strlen(str)) {}
 
-        StringView() : StringView(EMPTY, 0) {}
+        inline const char* str() const {
+            return m_str;
+        }
+        inline size_t len() const {
+            return m_len;
+        }
 
         friend bool operator==(const StringView& lhs, const StringView& rhs) {
-            ESP_LOGI(LOG_TAG, "lhs: %p, %u, %.*s", lhs.str, lhs.length, lhs.length, lhs.str ? lhs.str : "");
-            ESP_LOGI(LOG_TAG, "rhs: %p, %u, %.*s", rhs.str, rhs.length, rhs.length, rhs.str ? rhs.str : "");
-            if (lhs.length == rhs.length)
-                return strncmp(lhs.str, rhs.str, std::min(lhs.length, rhs.length)) == 0;
+            if (lhs.len() == rhs.len())
+                return strncmp(lhs.str(), rhs.str(), std::min(lhs.len(), rhs.len())) == 0;
             return false;
         }
         friend bool operator!=(const StringView& lhs, const StringView& rhs) {
@@ -47,20 +54,19 @@ namespace utils {
         }
 
         StringView splitAtLastOccurrence(char c) const {
-            const char* newStr = str + length - 1;
-            for (size_t i = 0; i < length; ++i, --newStr) {
+            const char* newStr = str() + len() - 1;
+            for (size_t i = 0; i < len(); ++i, --newStr) {
                 if (*newStr == c) {
                     if (!i)
                         break;
                     return StringView{newStr + 1, i};
                 }
             }
-
             return StringView{};
         }
 
         bool startsWith(const StringView& comp, StringView* end = nullptr) const {
-            if (comp.length > length || empty()) {
+            if (comp.len() > m_len || empty()) {
                 if (end)
                     *end = StringView{};
                 return false;
@@ -71,18 +77,18 @@ namespace utils {
                 return true;
             }
 
-            const char* iter = str;
-            const char* iterComp = comp.str;
+            const char* iter = str();
+            const char* iterComp = comp.str();
 
             size_t i = 0;
-            for (; i < comp.length; ++iter, ++iterComp, ++i) {
+            for (; i < comp.len(); ++iter, ++iterComp, ++i) {
                 if (*iter != *iterComp)
                     break;
             }
 
-            if (i >= comp.length) {
+            if (i >= comp.len()) {
                 if (end)
-                    *end = StringView{iter, length - i};
+                    *end = StringView{iter, m_len - i};
                 return true;
             }
             if (end)
@@ -90,8 +96,8 @@ namespace utils {
             return false;
         }
 
-        bool empty() const {
-            return !str || !length;
+        inline bool empty() const {
+            return !m_str || !m_len || !(*m_str);
         }
 
         class Splitter {
@@ -103,21 +109,17 @@ namespace utils {
 
                public:
                 Iterator(const StringView& str, char delim) : m_delim(delim), m_str(&str), m_curr(0), m_last(0) {}
-                Iterator(const StringView& str, const char* curr) : m_delim(0), m_str(&str), m_curr(str.length), m_last(str.length) {}
+                Iterator(const StringView& str, const char* curr) : m_delim(0), m_str(&str), m_curr(str.len()), m_last(str.len()) {}
 
                 Iterator& operator++(void) {
-                    ESP_LOGI(LOG_TAG, "1.1");
-                    if (m_curr < m_str->length)
+                    if (m_curr < m_str->len())
                         ++m_curr;
-                    ESP_LOGI(LOG_TAG, "1.2");
                     m_last = m_curr;
-                    ESP_LOGI(LOG_TAG, "1.3");
-                    for (; m_curr < m_str->length; ++m_curr) {
-                        if (m_str->str[m_curr] == m_delim) {
+                    for (; m_curr < m_str->len(); ++m_curr) {
+                        if (m_str->str()[m_curr] == m_delim) {
                             break;
                         }
                     }
-                    ESP_LOGI(LOG_TAG, "1.4");
                     return *this;
                 }
 
@@ -128,13 +130,13 @@ namespace utils {
                 }
 
                 value_type operator*() const {
-                    if(m_last >= m_str->length)
+                    if (m_last >= m_str->len())
                         return StringView{};
-                    return StringView{m_str->str + m_last, (size_t)(m_curr - m_last)};
+                    return StringView{m_str->str() + m_last, (size_t)(m_curr - m_last)};
                 }
 
                 friend bool operator==(const Iterator& lhs, const Iterator& rhs) {
-                    return lhs.m_curr == rhs.m_curr && lhs.m_last == rhs.m_last;
+                    return lhs.m_curr == rhs.m_curr && lhs.m_last == rhs.m_last && lhs.m_str->str() == rhs.m_str->str();
                 }
                 friend bool operator!=(const Iterator& lhs, const Iterator& rhs) {
                     return !(lhs == rhs);
@@ -152,7 +154,7 @@ namespace utils {
                 return Iterator{m_str, m_delim};
             }
             Iterator end() {
-                auto end = Iterator{m_str, m_str.str + m_str.length};
+                auto end = Iterator{m_str, m_str.str() + m_str.len()};
                 auto iter = begin();
                 auto lastNonEmpty = iter;
                 for (; iter != end; ++iter)
@@ -168,128 +170,175 @@ namespace utils {
     };
 
     struct String : public StringView {
-        using Destructor = void (*)(char*);
+        using DtorType = void (*)(char*);
 
        public:
-        static void defaultDestructor(char* data) {
+        static void defaultDelete(char* data) {
             delete[] data;
         }
-        static void freeDestructor(char* data) {
+        static void freeDelete(char* data) {
             free(data);
         }
 
-       public:
-        Destructor dtor;
-        size_t capacity;
+       private:
+        size_t m_cap{0};
+        DtorType m_dtor{nullptr};
 
-        String(const String& obj) : StringView((const char*)obj.str, obj.length), dtor(nullptr), capacity(0) {}
-        String(String&& obj) : StringView((const char*)obj.str, obj.length), dtor(obj.dtor), capacity(obj.capacity) {
-            obj.str = nullptr;
-            obj.dtor = nullptr;
+       public:
+        constexpr String() : StringView() {}
+        template <size_t N>
+        constexpr String(const char (&arr)[N]) : StringView(arr, N - 1) {}
+        String(const char* str, size_t length, bool shouldCopy) : StringView(str, length) {
+            if (shouldCopy)
+                copy(str, length);
+        }
+        String(const StringView& str) : String(str.str(), str.len(), false) {}
+        constexpr String(char* str, size_t length, size_t cap, DtorType dtor) : StringView(str, length), m_cap(cap), m_dtor(dtor) {}
+        String(size_t cap) : String() {
+            allocate(cap);
         }
 
-        String() : StringView(), dtor(nullptr), capacity(0) {}
-        String(const StringView& str) : StringView(str), dtor(nullptr), capacity(0) {}
-        String(char* str, size_t length, size_t cap, Destructor destructor = defaultDestructor) : StringView(str, length), dtor(destructor), capacity(cap) {}
-        String(const char* buf, size_t len, bool copy) {
-            if (!copy) {
-                *this = String{StringView{buf, length}};
-            } else {
-                if (allocate(length)) {
-                    memcpy(str, buf, length);
-                    length = len;
-                }
-            }
+        String(const String& obj) = delete;
+        String(String&& obj) : StringView(static_cast<const StringView&>(obj)), m_cap(obj.m_cap), m_dtor(obj.m_dtor) {
+            obj.init();
         }
 
         ~String() {
             destruct();
         }
 
-        void clear() {
-            if (!dtor)
-                return;
-            memset(str, 0, capacity);
+       private:
+        inline void init() {
+            m_str = EMPTY;
+            m_len = 0;
+            m_cap = 0;
+            m_dtor = nullptr;
         }
 
-        bool allocate(size_t count) {
-            str = new char[count + 1];
-            if (!str) {
-                return false;
-            }
-            capacity = count;
-            str[count] = 0;
-            dtor = defaultDestructor;
-            return true;
+       public:
+        inline char* buf() {
+            ASSERT(owner(), LOG_TAG);
+            return const_cast<char*>(m_str);
+        }
+        inline size_t cap() const {
+            return m_cap;
+        }
+        inline bool owner() const {
+            return m_dtor;
+        }
+
+        char* release() {
+            char* result = buf();
+            init();
+            return result;
         }
 
         void destruct() {
-            if (dtor && str) {
-                dtor(str);
+            if (owner() && m_str) {
+                ASSERT(m_cap, LOG_TAG);
+                ASSERT(m_dtor, LOG_TAG);
+
+                m_dtor(buf());
+                init();
             }
-            str = nullptr;
-            length = 0;
-            capacity = 0;
-            dtor = nullptr;
         }
 
-        static String fromNumber(size_t num) {
-            auto result = create(10);
-            char* str = result.str - 1;
-            uint8_t i = 0;
-            for (; num > 0; ++i) {
-                size_t digit = num % 10;
-                num = num / 10;
+        void clear() {
+            if (!owner())
+                return;
+            memset(buf(), 0, cap());
+        }
 
-                ++str;
+        bool allocate(size_t count) {
+            destruct();
+
+            m_str = new char[count + 1];
+            if (!m_str) {
+                init();
+                return false;
+            }
+            m_dtor = defaultDelete;
+            buf()[count] = '\0';
+            m_cap = count;
+            return true;
+        }
+
+        bool copy(const char* str, size_t len) {
+            if (!str)
+                return false;
+            if (!allocate(len))
+                return false;
+            memcpy(buf(), str, len);
+            m_len = len;
+            return true;
+        }
+        bool copy() {
+            if (owner() || empty())
+                return false;
+            return copy(m_str, m_len);
+        }
+
+        static String fromNumber(size_t value) {
+            String result{10};
+            if (!result.owner())
+                return {};
+
+            char* str = result.buf();
+            uint8_t i = 0;
+            for (++value; value > 0; ++i) {
+                size_t digit = (value - 1) % 10;
+                value = (value - digit) / 10;
+
                 *str = '0' + digit;
+                ++str;
             }
 
-            for (char* begin = result.str; begin < str; ++begin, --str) {
+            --str;
+            for (char* begin = result.buf(); begin < str; ++begin, --str) {
                 char temp = *begin;
                 *begin = *str;
                 *str = temp;
             }
-            result.str[i] = 0;
+            result.buf()[i] = 0;
+            result.m_len = i;
             return result;
         }
 
-        static String create(const char* str, bool copy = true) {
+        static String makeHex(const uint8_t* buf, size_t len) {
+            String result{2 * len};
+
+            for (size_t i = 0; i < len; ++i, buf += 2) {
+                snprintf(&result.buf()[i << 1], 2, "%02hhX", *buf);
+            }
+            return result;
+        }
+
+        static String create(const char* str, size_t length) {
             if (!str)
                 return {};
-            size_t length = strlen(str);
+            return String{str, length, true};
+        }
 
-            String result{};
-            if (!result.allocate(length))
-                return {};
-            memcpy(result.str, str, length);
-            result.length = length;
-
-            return result;
+        static String fromCStr(const char* str) {
+            return create(str, strlen(str));
         }
 
         static String create(size_t capacity) {
-            char* buf = new char[capacity + 1];
-            ASSERT_RET(buf, String{}, LOG_TAG);
-            buf[capacity] = 0;
-            return String{buf, capacity, capacity};
+            return String{capacity};
         }
 
-        String& operator=(const String& obj) {
-            str = obj.str;
-            length = obj.length;
-            capacity = 0;
-            dtor = nullptr;
+        const StringView& view() const{
             return *this;
         }
-        String& operator=(String&& obj) {
-            str = obj.str;
-            length = obj.length;
-            dtor = obj.dtor;
-            capacity = obj.capacity;
 
-            obj.str = nullptr;
-            obj.dtor = nullptr;
+        String& operator=(const String& obj) = delete;
+        String& operator=(String&& obj) {
+            m_str = obj.m_str;
+            m_len = obj.m_len;
+            m_dtor = obj.m_dtor;
+            m_cap = obj.m_cap;
+
+            obj.init();
             return *this;
         }
     };

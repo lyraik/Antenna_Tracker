@@ -16,7 +16,7 @@
 namespace fs {
 
     esp_err_t init() {
-        esp_vfs_spiffs_conf_t conf{"", "spiffs", 3, false};
+        esp_vfs_spiffs_conf_t conf{"", "spiffs", MAX_FILES_OPEN, false};
 
         ASSERT_RET_CHECK(esp_vfs_spiffs_register(&conf), LOG_TAG);
 
@@ -42,13 +42,12 @@ namespace fs {
 
     bool File::open(const char* path, mode_t mode) {
         m_file = fopen(path, mode);
-        ASSERT_RET(m_file, false, LOG_TAG);
+        if(!m_file){
+            ESP_LOGW(LOG_TAG, "Failed to open '%s'", path);
+            logError();
+            return false;
+        }
         return true;
-    }
-
-    bool File::tryOpen(const char* path, mode_t mode) {
-        m_file = fopen(path, mode);
-        return m_file;
     }
 
     void File::close() {

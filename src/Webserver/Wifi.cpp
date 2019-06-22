@@ -35,11 +35,11 @@ namespace wifi {
         // configure accesspoint
         wifi_ap_config_t apcfg;
 
-        ASSERT(ssid.length < sizeof(apcfg.ssid), LOG_TAG);
-        memcpy(apcfg.ssid, ssid.str, ssid.length + 1);
-        apcfg.ssid_len = ssid.length;
-        ASSERT(password.length < sizeof(apcfg.password), LOG_TAG);
-        memcpy(apcfg.password, password.str, password.length + 1);
+        ASSERT(ssid.len() < sizeof(apcfg.ssid), LOG_TAG);
+        memcpy(apcfg.ssid, ssid.str(), ssid.len() + 1);
+        apcfg.ssid_len = ssid.len();
+        ASSERT(password.len() < sizeof(apcfg.password), LOG_TAG);
+        memcpy(apcfg.password, password.str(), password.len() + 1);
         apcfg.channel = 6;
         apcfg.authmode = WIFI_AUTH_WPA2_PSK;
         apcfg.ssid_hidden = false;

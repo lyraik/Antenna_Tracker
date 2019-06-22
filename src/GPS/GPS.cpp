@@ -57,7 +57,7 @@ namespace GPS {
         uart_GPS.rx_flow_ctrl_thresh = 120;
         uart_param_config(UART_NUM_2, &uart_GPS);
         uart_set_pin(UART_NUM_2, TxPin, RxPin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-        uart_driver_install(UART_NUM_2, 2048, 2048, 10, &uart_QUEUE, NULL);
+        uart_driver_install(UART_NUM_2, 2048, 2048, 10, &uart_QUEUE, 0);
     }
 
     float getLat() {

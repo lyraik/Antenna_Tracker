@@ -18,7 +18,7 @@
 #include <stdint.h>
 
 namespace web {
-    namespace internal {
+    namespace rest {
 
         using ValueValidator = double (*)(double);
 
@@ -58,11 +58,10 @@ namespace web {
             cJSON_AddFalseToObject(parent, "readonly");
             cJSON_AddNumberToObject(parent, "unit", (double)type);
         }
-        inline static void createString(const char* str, bool reaonly, ValueType type, cJSON* parent) {
+        inline static void createString(const char* str, bool reaonly, cJSON* parent) {
             cJSON_AddStringToObject(parent, "value", str);
-            cJSON_AddStringToObject(parent, "type", "Number");
+            cJSON_AddStringToObject(parent, "type", "String");
             cJSON_AddFalseToObject(parent, "readonly");
-            cJSON_AddNumberToObject(parent, "unit", (double)type);
         }
     }  // namespace internal
 }  // namespace web

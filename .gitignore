@@ -1,8 +1,9 @@
 build
 .piolibdeps
-.vscode
 .pioenvs
-.vscode
 lib/readme.txt
 build/*
 include/README
+tools/*.pyc
+.vscode/*
+!.vscode/tasks.json

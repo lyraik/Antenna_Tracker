@@ -72,12 +72,12 @@ namespace sys {
         CHECK_AND_RET(cJSON_AddNumberToObject(ptr, internal::ANGLE_FROM_NORTH, direction.angleFromNorth));
         // bluetooth
         CHECK_AND_RET(ptr = cJSON_AddObjectToObject(json, internal::BLUETOOTH));
-        CHECK_AND_RET(cJSON_AddStringToObject(ptr, internal::NAME, bluetooth.name.str));
-        CHECK_AND_RET(cJSON_AddStringToObject(ptr, internal::UID, bluetooth.uid.str));
+        CHECK_AND_RET(cJSON_AddStringToObject(ptr, internal::NAME, bluetooth.name.str()));
+        CHECK_AND_RET(cJSON_AddStringToObject(ptr, internal::UID, bluetooth.uid.str()));
         // wifi
         CHECK_AND_RET(ptr = cJSON_AddObjectToObject(json, internal::WIFI));
-        CHECK_AND_RET(cJSON_AddStringToObject(ptr, internal::SSID, wifi.ssid.str));
-        CHECK_AND_RET(cJSON_AddStringToObject(ptr, internal::PASSWORD, wifi.password.str));
+        CHECK_AND_RET(cJSON_AddStringToObject(ptr, internal::SSID, wifi.ssid.str()));
+        CHECK_AND_RET(cJSON_AddStringToObject(ptr, internal::PASSWORD, wifi.password.str()));
         // stepper
         CHECK_AND_RET(ptr = cJSON_AddObjectToObject(json, internal::STEPPER));
         CHECK_AND_RET(cJSON_AddNumberToObject(ptr, internal::CHANGE_PER_STEP, stepper.changePerStep));
@@ -91,7 +91,7 @@ namespace sys {
         auto str = cJSON_PrintUnformatted(json);
         CHECK_AND_RET_MSG(!str.empty(), internal::STRINGIFY_ERROR);
 
-        conf.write(str.str, str.length);
+        conf.write((const void*)str.str(), str.len());
     }
 
     void Config::load() {
@@ -104,15 +104,15 @@ namespace sys {
         ESP_LOGI(LOG_TAG, "before length");
         size_t length = conf.length();
         ESP_LOGI(LOG_TAG, "len %d", length);
-        utils::String buf = utils::String::create(length);
-        ESP_LOGI(LOG_TAG, "len %d ptr %d", length, (uintptr_t)buf.str);
+        utils::String buf{length};
+        ESP_LOGI(LOG_TAG, "len %d ptr %d", length, (uintptr_t)buf.str());
 
-        size_t read = conf.read(buf.str, length);
+        size_t read = conf.read(buf.buf(), length);
         ASSERT_RET(read == length, , LOG_TAG);
 
         // parse json object
         const char* parseEnd = nullptr;
-        auto json = cJSON_ParseWithOpts(buf.str, &parseEnd, false);
+        auto json = cJSON_ParseWithOpts(buf.str(), &parseEnd, false);
         if (!json) {
             ESP_LOGE(LOG_TAG, "%s Last position:\n%s", internal::PARSE_ERROR, parseEnd);
             return;
@@ -132,19 +132,19 @@ namespace sys {
         CHECK_AND_RET2(cJSON_IsObject(ptr));
         CHECK_AND_RET2(val = cJSON_GetObjectItemCaseSensitive(ptr, internal::NAME));
         CHECK_AND_RET2(cJSON_IsString(val));
-        bluetooth.name = utils::String::create(val->valuestring);
+        bluetooth.name = utils::String::fromCStr(val->valuestring);
         CHECK_AND_RET2(val = cJSON_GetObjectItemCaseSensitive(ptr, internal::UID));
         CHECK_AND_RET2(cJSON_IsString(val));
-        bluetooth.uid = utils::String::create(val->valuestring);
+        bluetooth.uid = utils::String::fromCStr(val->valuestring);
 
         CHECK_AND_RET2(ptr = cJSON_GetObjectItemCaseSensitive(json, internal::WIFI));
         CHECK_AND_RET2(cJSON_IsObject(ptr));
         CHECK_AND_RET2(val = cJSON_GetObjectItemCaseSensitive(ptr, internal::SSID));
         CHECK_AND_RET2(cJSON_IsString(val));
-        wifi.ssid = utils::String::create(val->valuestring);
+        wifi.ssid = utils::String::fromCStr(val->valuestring);
         CHECK_AND_RET2(val = cJSON_GetObjectItemCaseSensitive(ptr, internal::PASSWORD));
         CHECK_AND_RET2(cJSON_IsString(val));
-        wifi.password = utils::String::create(val->valuestring);
+        wifi.password = utils::String::fromCStr(val->valuestring);
 
         CHECK_AND_RET2(ptr = cJSON_GetObjectItemCaseSensitive(json, internal::STEPPER));
         CHECK_AND_RET2(cJSON_IsObject(ptr));

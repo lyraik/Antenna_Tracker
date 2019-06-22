@@ -21,17 +21,20 @@
 namespace web {
     static constexpr const char LOG_TAG[] = "web";
 
-    static constexpr size_t STACK_SIZE = 9000;
+    static constexpr size_t STACK_SIZE = 8192;
     static constexpr size_t MAX_URI_LENGTH = 1024;
     static constexpr size_t FILE_SERVE_BUFFER_SIZE = 512;
     static constexpr size_t FILE_SERVE_MIN_SEND_BUF_SIZE = 50;
 
+    static constexpr const char INDEX_FILE_PATH[] = "/index.html";
+    static constexpr const float FILE_REQUEST_POSTPONE_TIME = 0.2;
+    static constexpr const size_t MAX_FILE_REQUESTS = 6;
 
     esp_err_t init();
     esp_err_t deinit();
 
     struct MimeType {
-        enum Code : uint8_t { TEXT_PLAIN, TEXT_HTML, TEXT_CSS, TEXT_JS, APP_JSON, COUNT };
+        enum Code : uint8_t { TEXT_PLAIN, TEXT_HTML, TEXT_CSS, TEXT_JS, APP_JSON, IMAGE_BMP, IMAGE_PNG, IMAGE_JPEG, COUNT };
 
         utils::StringView fileExt;
         utils::StringView mimeType;

@@ -26,7 +26,7 @@ bool check = false;
  * @param Scl 
  * @return uint8_t 
  */
-uint8_t init(i2c_port_t Port, i2c_mode_t Mode, uint32_t Frequency, gpio_num_t Sda, gpio_num_t Scl)
+int8_t init(i2c_port_t Port, i2c_mode_t Mode, uint32_t Frequency, gpio_num_t Sda, gpio_num_t Scl)
 {
     I2CPort = Port;
     if (check == true)

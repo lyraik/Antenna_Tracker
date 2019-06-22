@@ -19,7 +19,7 @@
 #include <mongoose/mongoose.h>
 
 #include "FileRequest.h"
-#include "RestRequest.h"
+#include "Rest.h"
 
 namespace web {
 
@@ -31,11 +31,10 @@ namespace web {
 
         WebServer* webServer = nullptr;
 
-        const MimeType MIME_TYPES[] = {{utils::StringView{"txt"}, utils::StringView{"text/plain"}},
-                                       {utils::StringView{"html\0htm"}, utils::StringView{"text/html"}},
-                                       {utils::StringView{"css"}, utils::StringView{"text/css"}},
-                                       {utils::StringView{"js\0mjs"}, utils::StringView{"text/javascript"}},
-                                       {utils::StringView{"json"}, utils::StringView{"application/json"}}};
+        const MimeType MIME_TYPES[] = {{utils::StringView{"txt"}, utils::StringView{"text/plain"}},        {utils::StringView{"html\0htm"}, utils::StringView{"text/html"}},
+                                       {utils::StringView{"css"}, utils::StringView{"text/css"}},          {utils::StringView{"js\0mjs"}, utils::StringView{"text/javascript"}},
+                                       {utils::StringView{"json"}, utils::StringView{"application/json"}}, {utils::StringView{"bmp"}, utils::StringView{"image/bmp"}},
+                                       {utils::StringView{"png"}, utils::StringView{"image/png"}},         {utils::StringView{"jpg\0jpeg\0jpe"}, utils::StringView{"image/jpeg"}}};
 
     }  // namespace internal
 
@@ -43,15 +42,15 @@ namespace web {
         for (size_t i = 0; i < COUNT; ++i) {
             const MimeType& type = internal::MIME_TYPES[i];
 
-            if (type.fileExt.length < fileExt.length || !fileExt.length)
+            if (type.fileExt.len() < fileExt.len() || fileExt.empty())
                 continue;
-            const char* ext = type.fileExt.str;
-            const char* comp = fileExt.str;
+            const char* ext = type.fileExt.str();
+            const char* comp = fileExt.str();
 
-            for (size_t extIndex = 0; extIndex < type.fileExt.length; ++extIndex) {
+            for (size_t extIndex = 0; extIndex < type.fileExt.len(); ++extIndex) {
                 size_t u = 0;
                 bool broke = false;
-                for (; u < fileExt.length; ++u) {
+                for (; u < fileExt.len(); ++u) {
                     if (ext[u] != comp[u] || !(ext[extIndex])) {
                         broke = true;
                         break;
@@ -105,7 +104,7 @@ namespace web {
         m_socket = mg_bind(&m_mgr, internal::HTTP_PORT, [](mg_connection* c, int ev, void* p) { static_cast<WebServer*>(c->mgr->user_data)->eventHandler(c, ev, p); });
 
         if (!m_socket) {
-            ESP_LOGW(LOG_TAG, "Could not create socket.");
+            ESP_LOGE(LOG_TAG, "Could not create socket.");
             return ESP_FAIL;
         }
 
@@ -125,7 +124,7 @@ namespace web {
                 mg_mgr_free(&server->m_mgr);
                 delete server;
 
-                vTaskDelete(server->m_task);
+                vTaskDelete(NULL);
             },
             "WebServer", STACK_SIZE, this, 1, &m_task);
 
@@ -159,11 +158,10 @@ namespace web {
                 ESP_LOGI(LOG_TAG, "Received http request '%.*s' from %s.", (int)msg->uri.len, msg->uri.p, addr);
 
                 utils::StringView uri{msg->uri.p, msg->uri.len};
-                utils::StringView result;
-                if (uri.startsWith(internal::REST_URI, &result)) {
+                if (uri.startsWith(internal::REST_URI)) {
                     return handleRestRequest(con, msg, uri);
-                } else if (uri.startsWith(internal::WEBPAGE_URI, &result)) {
-                    return internal::FileRequest::handleRequest(con, msg, result);
+                } else if (uri.startsWith(internal::WEBPAGE_URI)) {
+                    return internal::FileRequest::handleRequest(con, msg, uri);
                 }
 
                 mg_http_send_error(con, 404, nullptr);
@@ -174,28 +172,34 @@ namespace web {
                     break;
                 break;
             }
+            case MG_EV_TIMER: {
+                if (internal::FileRequest::handleTimer(con, event, ptr))
+                    break;
+                break;
+            }
         }
     }
 
     void WebServer::handleRestRequest(mg_connection* con, http_message* msg, const utils::StringView& uri) {
-        mg_http_send_error(con, 501, nullptr);
         utils::StringView method{msg->method.p, msg->method.len};
 
         if (method == "GET") {
             size_t index = 0;
             bool arrayNode = false;
-            const internal::Node* node = internal::rest::findNode(uri, index, arrayNode, '/');
+            auto node = rest::findNode(uri, index, arrayNode, '/');
 
             if (!node) {
                 return mg_http_send_error(con, 500, "Node not found");
             }
 
-            cJSON* json = internal::rest::createJSON(node, nullptr, arrayNode, index);
-            if (!node) {
+            utils::JsonGuard json{rest::createJSON(node, nullptr, arrayNode, index)};
+            if (!json.get()) {
                 return mg_http_send_error(con, 500, "JSON building failed");
             }
 
-            utils::String jsonStr = cJSON_Print(json);
+            utils::String jsonStr = cJSON_Print(json.get());
+            json.reset();
+
             if (jsonStr.empty()) {
                 return mg_http_send_error(con, 500, "JSON stringify failed");
             }
@@ -204,9 +208,10 @@ namespace web {
             mg_printf(con,
                       "API-Version: %s\r\n"
                       "Content-Type: %s\r\n"
-                      "Content-Length: %u\r\n\r\n",
-                      internal::rest::VERSION.str, MimeType::getFromCode(MimeType::APP_JSON).mimeType.str, jsonStr.length);
-            mg_send(con, jsonStr.str, jsonStr.length);
+                      "Content-Length: %u\r\n\r\n"
+                      "%.*s\r\n",
+                      rest::VERSION, MimeType::getFromCode(MimeType::APP_JSON).mimeType.str(), jsonStr.len() + 1, (int)jsonStr.len() + 1, jsonStr.str());
+
             return;
         } else if (method == "POST") {
         }
