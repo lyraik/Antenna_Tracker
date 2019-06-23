@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
-    <title>Antennatracker</title>
+    <title>Antenna Tracker</title>
     <link rel="stylesheet" , type="text/css" , href="style.css">
 </head>
 
-<body style="background-color: #272727" onload="setProgressBar(160)">
+<body onload="setProgressBar(40)">
     <script>
         setInterval(() => {
 
@@ -119,59 +118,72 @@
         }
 
         function setProgressBar(angle) {
-            var topval = String(478 - angle);
-            document.getElementById("progressbar").style.height = String(50 + angle).concat("px");
-            document.getElementById("progressbar").style.top = topval.concat("px");
+            let offset = angle / 180 * 540;
+            let fillOffset = angle / 180 * 537.8;
+            document.getElementById("progressbar").style.bottom = offset + "px";
+            document.getElementById("progressFill").style.height = fillOffset + "px";
         }
 
         function selectdevice() {
             var sel = document.getElementById("devices");
             var selval = sel.options[sel.selectedIndex].text;
-            post("bluetooth/set",selval);
+            post("bluetooth/set", selval);
         }
     </script>
-    <H3
-        style="width: 1203px; position: absolute; top: 0cm; background-color: #555555;background-size: 50px; line-height: 50px; color:white; align-content: center">
-        Antenna Tracker
-    </H3>
-
-
-    <input id="req" type="button" style="align-self: center" onclick="get('scan')" value="Get Bluetooth devices">
-
-    <select id="devices" style="color: white" onchange="selectdevice()">
-        <option>please select a device</option>
-    </select>
-
-
-    <input id="manual" type="button" style="align-self: center" onclick="manualControl()"
-        value="activate manual control">
+    <header id="header">
+        <H3 class="heading">
+            Antenna Tracker
+        </H3>
+        <button id="req" onclick="get('scan')">
+            Get Bluetooth devices
+        </button>
+        <select id="devices" onchange="selectdevice()">
+            <option>please select a device</option>
+        </select>
+    </header>
 
     <!--Menu-->
     <ul id="menu">
-        <li><a onclick="get('wifi')">wifi</a></li>
-
-        <li><a onclick="get('battery')">battery</a></li>
-
-        <li><a onclick="get('system')">system</a></li>
-
-        <li><a onclick="get('settings')">settings</a></li>
+        <a onclick="get('wifi')">
+            <li>WiFi</li>
+        </a>
+        <a onclick="get('battery')">
+            <li>Battery</li>
+        </a>
+        <a onclick="get('system')">
+            <li>System</li>
+        </a>
+        <a onclick="get('settings')">
+            <li>Settings</li>
+        </a>
     </ul>
 
-
-    <!--Images-->
-    <div id="images">
-        <img id="circle" src="img/circle360.bmp">
-        <img id="compNeedle" style="transform: rotate(0deg)" src="img/compNeedle.bmp" width="100" height="100">
-        <img id="levelbar" src="img/levelbar.png" width="50" height="500">
-        <img id="progressbar" src="img/progressBar.png" width="10" height="50">
-        <img id="heightNeedle" src="img/compNeedle100.png" width="50" height="50">
-
+    <div id="overview">
+        <ul id="status">
+            <li class="on">ADC</li>
+            <li class="on">Magnetsens</li>
+            <li class="on">WiFi</li>
+            <li class="on">Bluetooth</li>
+            <li class="on">I2C</li>
+            <li class="on">SPI</li>
+            <li class="on">Drone</li>
+        </ul>
+        <div id="ctrl">
+            <div class="inner">
+                <button id="manual" class="off" type="button" onclick="manualControl()">
+                    manual
+                </button>
+                <div id="dir" style="background-image: url('img/circle360.bmp')">
+                    <img id="compNeedle" style="transform: rotate(0deg)" src="img/compNeedle.bmp" width="100"
+                        height="100">
+                </div>
+            </div>
+            <div id="level" style="background-image: url('img/levelbar.png')">
+                <img id="progressbar" src="img/compNeedle100.png" width="50">
+                <span id="progressFill"></span>
+            </div>
+        </div>
     </div>
-
-    <table id="output">
-        <tr>
-        </tr>
-    </table>
 
     <table id="vals">
         <tr>
@@ -282,31 +294,7 @@
         </tr>
     </table>
 
-    <table id="systems">
-        <tr>
-            <th>
-                <p>ADC</p>
-            </th>
-            <th>
-                <p>Magnetsens</p>
-            </th>
-            <th>
-                <p>WIFI</p>
-            </th>
-            <th>
-                <p>Bluetooth</p>
-            </th>
-            <th>
-                <p>I2C</p>
-            </th>
-            <th>
-                <p>SPI</p>
-            </th>
-            <th>
-                <p>Drohne</p>
-            </th>
-        </tr>
-    </table>
+
 
 
 </body>
